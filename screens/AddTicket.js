@@ -7,6 +7,11 @@ import { useState, useEffect } from 'react';
 export default function AddTicket({ navigation }) {
   const [ticketName,setTicketName] = useState('');
   const [ticketPrice,setTicketPrice] = useState('');
+  const [ticketStart,setTicketStart] = useState('');
+  const [ticketDest,setTicketDest] = useState('');
+  const [ticketDur,setTicketDur] = useState('');
+  const [ticketCom,setTicketCom] = useState('');
+  const [ticketQuota,setTicketQuota] = useState('');
   const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
   const addTicket = async () => {
     
@@ -19,18 +24,32 @@ export default function AddTicket({ navigation }) {
       },
       body: JSON.stringify({
         name:ticketName,
-        price:ticketPrice
+        price:ticketPrice,
+        start:ticketStart,
+        dest:ticketDest,
+        duration:ticketDur,
+        company:ticketCom,
+        quota:ticketQuota
       })
     }
     )
     .then((response) => response.text())
     .then((responseText) => { 
       alert(responseText);
-      if(responseText=='Add Ticket Success')
-      navigation.navigate("Home");})
+      if(responseText=='Add Ticket Success'){
+      fetchTicket();
+      navigation.navigate("Home");
+      }
+    })
     .catch((error) => { console.warn(error); });
   }
-
+  const fetchTicket = () =>{
+    fetch(baseUrl+'/api/ticket/getTicket')
+        .then((response) => response.json())
+        .then((json) => console.log(json))
+        .catch((error) => console.error(error))
+        .finally(() => console.log('success'));
+  }
     return (
       <ScrollView style={[localStyles.container]}>
       <Text style={[localStyles.header]}>Add new Ticket</Text>
@@ -43,6 +62,32 @@ export default function AddTicket({ navigation }) {
         </TextInput>
         <TextInput style={[localStyles.input]} placeholder="Ticket Price"
           onChangeText={ticketPrice => setTicketPrice(ticketPrice)} defaultValue={ticketPrice}
+          placeholderTextColor="#b3cddf"
+        >
+        </TextInput>
+        <TextInput style={[localStyles.input]} placeholder="Start"
+          onChangeText={ticketStart => setTicketStart(ticketStart)} defaultValue={ticketStart}
+          placeholderTextColor="#b3cddf"
+        >
+        </TextInput>
+        <TextInput style={[localStyles.input]} placeholder="Destination"
+          onChangeText={ticketDest => setTicketDest(ticketDest)} defaultValue={ticketDest}
+          placeholderTextColor="#b3cddf"
+        >
+        </TextInput>
+        <TextInput style={[localStyles.input]} placeholder="Duration"
+          onChangeText={ticketDur => setTicketDur(ticketDur)} defaultValue={ticketDur}
+          placeholderTextColor="#b3cddf"
+        >
+        </TextInput>
+       
+        <TextInput style={[localStyles.input]} placeholder="Company"
+          onChangeText={ticketCom => setTicketCom(ticketCom)} defaultValue={ticketCom}
+          placeholderTextColor="#b3cddf"
+        >
+        </TextInput>
+        <TextInput style={[localStyles.input]} placeholder="Quota"
+          onChangeText={ticketQuota => setTicketQuota(ticketQuota)} defaultValue={ticketQuota}
           placeholderTextColor="#b3cddf"
         >
         </TextInput>
@@ -101,7 +146,7 @@ export default function AddTicket({ navigation }) {
       marginBottom: '5%',
       borderWidth: 1,
       borderColor: '#b3cddf',
-      padding: '5%',
+      padding: 10,
     },
     create: {
       backgroundColor: "#fff",
@@ -114,7 +159,7 @@ export default function AddTicket({ navigation }) {
     },
     button: {
       backgroundColor: "#145F95",
-      padding: 20,
+      padding: 10,
       borderRadius: 5,
       margin: '5%',
     },

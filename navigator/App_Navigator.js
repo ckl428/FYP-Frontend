@@ -6,11 +6,14 @@ import Register from "../pages/Register";
 import Intro from "../pages/Intro";
 import Tab_Navigator from "./Tab_Navigator";
 import AddTicket from "../screens/AddTicket";
+import Detail from "../screens/Detail";
 
 
 
 
 function App_Navigator() {
+
+  
   //Declare components first
   const Stack = createStackNavigator();
   const loginComponent = (navigation) => (
@@ -28,6 +31,10 @@ function App_Navigator() {
   const addTicketComponent = (navigation) => (
     <AddTicket navigation={navigation.navigation}/>
   );
+  const detailComponent = (navigation,route) => (
+    <Detail navigation={navigation.navigation} route={navigation.route}/>
+  );
+
  
   return (
     <NavigationContainer>
@@ -55,6 +62,11 @@ function App_Navigator() {
         <Stack.Screen
           name="AddTicket"
           component={addTicketComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Detail"
+          component={detailComponent}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

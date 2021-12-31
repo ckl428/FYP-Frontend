@@ -1,48 +1,125 @@
 import React from 'react'
-import { View, Text, StyleSheet,FlatList } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet,FlatList,ScrollView,Image, SafeAreaView } from 'react-native'
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
-
-
-
-
+import Card from '../layout/Card';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AnimatedLottieView from 'lottie-react-native';
 
 
 
 
 
 export default function Home({ navigation }) {
-  const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
-  const [name,setName] = useState('');
+  
+  const [user,setUser] = useState('')
+  const [data,setData] = useState([]);
+  const [search,setSearch] = useState('');
+  const [loading,setLoading] = useState(true)
+ 
 
+  
  
 
     useEffect(() => {
+      
+      AsyncStorage.getItem('userName').then((value)=>{
+        setUser(value)
+        console.log('saved user', user)
+      })
+     
       fetchTicket()
+      
     }, []);
-  
+
+  const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
   const fetchTicket = () =>{
     fetch(baseUrl+'/api/ticket/getTicket')
         .then((response) => response.json())
-        .then((json) => setName(json))
+        .then((json) => setData(json))
         .catch((error) => console.error(error))
-        .finally(() => console.log('Name data'));
+        .finally(() => setLoading(false));
   }
+ 
+  const filteredData = search?data.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase()))
+  :data
+
+  const currentUser = user?user:"Guest"
+  //console.log('Filter', filteredData)
+  //console.log('Name data after fetch')
+  //const filteredData = data? data.filter(data.dest.toLowerCase().includes(search.toLowerCase())) : data;
   
+  //<Button onPress={() => 
+  //navigation.navigate('nameComponentInStack', {screen: 'ScreenName', params: {paramName: paramValue}})}
+  let content  = 
+  <FlatList
+    style={{}}
+    data={filteredData}
+    keyExtractor={item => item._id}
+    renderItem={({ item }) => (
+    <Card>
+      <TouchableOpacity onPress={()=>{
+      navigation.navigate('Detail', {
+      _id: item._id,
+      name: item.name,
+      price: item.price,
+      start:item.start,
+      dest:item.dest,
+      company:item.company,
+      image: item.image,
+      quota:item.quota,
+    });
+  }}
+  >
+  <Image
+  style={localStyles.image}
+  source={{
+  uri: item.image,
+  }}
+  />
+  <Text style={localStyles.contents}>{item.start} ------- {item.dest}</Text>
+</TouchableOpacity>
+</Card>
+)}
+/>
+  
+  return (
+       
+        <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
+         
+        
     
-  
-    return (
-        <View style={{justifyContent:'center', alignItems:'center', marginTop:'50%' }}>
-          <Text style={localStyles.text}>All Flight Tickets</Text>
-              <FlatList
-                data={name}
-                keyExtractor={({ id ,index}) => id}
-                renderItem={({ item }) => (
-                <Text style={localStyles.contents}>Ticket: {item.name}, Price: {item.price}</Text>
-                )}
-              />
+        <Text style={localStyles.text}>Hello {currentUser}</Text>
+
+        <Card>
+        <View style={{flexDirection:'row', }}>
+        <TextInput 
+        placeholder='Where you want to go?'
+        keyboardType="default"
+        onChangeText={search => setSearch(search)} 
+        defaultValue={search}
+        ></TextInput>
+        <View style={{flexDirection:'row',marginLeft: 'auto',  marginHorizontal:4,
+            marginVertical:6}}>
+              <TouchableOpacity onPress={()=>{
+                setSearch('')
+              }}>
+        <Text>X</Text>
+        </TouchableOpacity>
         </View>
-      );
+        
+        </View>
+        </Card>
+        
+        {loading?<AnimatedLottieView source={require('../loading.json')} autoPlay loop/>:content}
+       
+
+
+       
+      
+              
+        </SafeAreaView>
+    );
   }
 
   
@@ -59,7 +136,7 @@ export default function Home({ navigation }) {
         color:'#14956f'
     },
     contents:{
-      fontSize:24,
+      fontSize:18,
         color:'#ff0095'
     },
     header: {
@@ -110,6 +187,11 @@ export default function Home({ navigation }) {
       fontSize: 24,
       color: '#fff',
       textAlign: 'center'
+    },
+    image:{
+      width: '100%',
+      height: 150,
+      borderRadius:6
     },
   });
   

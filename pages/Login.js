@@ -2,7 +2,9 @@ import * as React from 'react';
 import { View, Text, Button, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { registerRootComponent } from 'expo';
-import { Platform } from 'react-native';
+import { Platform, } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 function Login({ navigation }) {
   const [name,setName] = useState('');
@@ -25,12 +27,43 @@ function Login({ navigation }) {
       })
     }).then((response) => response.text())
     .then((responseText) => { 
-      alert(responseText);
+      
+      //console.log(JSON.parse(responseText))
+      //let user = JSON.parse(responseText)
+        //alert('Login success')
+        //let user = JSON.stringify(response.text)
 
-      if(responseText=='Login success')
+    if(responseText == '"email" is not allowed to be empty'){
+      alert(responseText)
+      return
+    }
+    if(responseText == '"email" length must be at least 6 characters long'){
+      alert(responseText)
+      return
+    }
+    if(responseText == '"email" must be a valid email'){
+      alert(responseText)
+      return
+    }
+    if(responseText == '"password" length must be at least 6 characters long'){
+      alert(responseText)
+      return
+    }
+    if(responseText == 'No such user'){
+      alert(responseText)
+      return
+    }
+    if(responseText == 'Invalid password'){
+      alert(responseText)
+      return
+    }
+    else{
+      alert(responseText)
+      let user = JSON.parse(responseText)
+      AsyncStorage.setItem('userName',user.name)
+      alert('Login success '+ user.name)
       navigation.navigate('Intro')
-      else
-      return;
+    }
     })
     .catch((error) => { console.warn(error); });
   }

@@ -2,22 +2,30 @@ import React from 'react'
 import { View, Text, StyleSheet,ScrollView,SafeAreaView,TextInput } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Setting({ navigation }) {
   const [ticketName,setTicketName] = useState('');
 
+  const logout = ()=>{
+    AsyncStorage.setItem('userName','')
+    navigation.navigate('Login')
+  }
     return (
       <ScrollView style={[localStyles.container]}>
       <Text style={[localStyles.header]}>CRUD PAGE(Test)</Text>
       <View style={[localStyles.secondContainer]}>
      
       <TouchableOpacity onPress={() => navigation.navigate('AddTicket')} style={localStyles.button}>
-      <Text style={localStyles.buttonText}>Add Ticket</Text>
+      <Text style={localStyles.buttonText}>Add Ticket(Admin)</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => alert('My account')} style={localStyles.button}>
+      <Text style={localStyles.buttonText}>My Account</Text>
       </TouchableOpacity>
 
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')} style={localStyles.button}>
+      <TouchableOpacity onPress={() => logout()} style={localStyles.button}>
       <Text style={localStyles.buttonText}>Logout</Text>
       </TouchableOpacity>
       </View>
@@ -78,7 +86,7 @@ export default function Setting({ navigation }) {
     },
     button: {
       backgroundColor: "#145F95",
-      padding: 20,
+      padding: 10,
       borderRadius: 5,
       margin: '5%',
     },
