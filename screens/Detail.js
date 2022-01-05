@@ -8,8 +8,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DatePicker from 'react-native-date-picker'
 
 export default function Detail({ route,navigation }) {
-    const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
+
+    const baseUrl = 'http://192.168.0.105:3000'
+
     const [user,setUser] = useState('')
+    const [userId, setUserId] = useState('')
     const [date, setDate] = useState(new Date())
     const [open, setOpen] = useState(false)
     const fetchTicket = () =>{
@@ -19,24 +22,95 @@ export default function Detail({ route,navigation }) {
           .catch((error) => console.error(error))
           .finally(() => console.log('Name data'));
     }
-    
-    useEffect(() => {
-        AsyncStorage.getItem('userName').then((value)=>{
+    const getUserInfo = async () =>{
+        await AsyncStorage.getItem('userName').then((value)=>{
             setUser(value)
-            console.log('saved user', user)
-          })
+        })
+        await AsyncStorage.getItem('userId').then((value)=>{
+            setUserId(value)
+        })
+    }
+
+    useEffect(() => {
+        getUserInfo()
         fetchTicket()
       }, []);
-    const { _id,name,price,start,dest,company,image,quota} = route.params;
+    
+    const { _id,paramUserId,name,price,start,dest,duration,company,image,quota} = route.params;
     //console.log('image', image)
 
-    const orderTicket = () =>{
-       if(user)
-       alert('Order success')
-       else
-       alert('Login first')
+    const orderTicket = async () =>{
+        console.log('selected user', user)
+        console.log('selected userID', userId)
+        console.log('selected ticketID',_id)
+        const url = baseUrl+'/api/ticket/orderTicket'
+        await fetch(url,{
+          method:'POST',
+          headers:{
+            'Accept':'application/json',
+            'Content-type':'application/json'
+          },
+          body: JSON.stringify({
+            _id:_id,
+            user:user,
+            userId:userId,
+            name:name,
+            price:price,
+            start:start,
+            dest:dest,
+            duration:duration,
+            company:company,
+            image:image,
+            quota:quota
+          })
+        }
+        )
+        .then((response) => response.text())
+        .then((responseText) => { 
+          alert(responseText);
+          if(responseText=='Add Order Success')
+            navigation.replace('Tab_Navigator')
+          })
+        .catch((error) => { console.warn(error); });
+         }
+
+    const deleteTicket = async () =>{
+    const url = baseUrl+'/api/ticket/deleteTicket'
+    await fetch(url,{
+      method:'POST',
+      headers:{
+        'Accept':'application/json',
+        'Content-type':'application/json'
+      },
+      body: JSON.stringify({
+        _id:_id
+      })
     }
-    
+    )
+    .then((response) => response.text())
+    .then((responseText) => { 
+      alert(responseText);
+      if(responseText=='Delete success'){
+        navigation.replace('Tab_Navigator')
+      }
+      })
+    .catch((error) => { console.warn(error); });
+     }
+     const checkUser = () =>{
+        if(!user)
+        alert('Please login first')
+        else
+        Alert.alert("Confirmation","Confirm order this ticket?",
+        [
+            { text: "Yes", onPress: () => 
+            orderTicket() 
+            },
+            { text: "No",onPress: () => alert("Order canceled"), style: "cancel"}
+            
+        ]
+)
+     }
+    //<Text style = {localStyles.contents}>Item id: {_id}</Text>
     return (
        
         <View style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
@@ -52,18 +126,24 @@ export default function Detail({ route,navigation }) {
               <Text style = {localStyles.contents}>Price: {price}</Text>
               <Text style = {localStyles.contents}>Start Airport: {start}</Text>
               <Text style = {localStyles.contents}>Destination Airport: {dest}</Text>
+              <Text style = {localStyles.contents}>Duration: {duration}</Text>
               <Text style = {localStyles.contents}>Flight Company: {company}</Text>
               <Text style = {localStyles.contents}>Quota: {quota}</Text>
             </Card>
+            
       
-            <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm order this ticket?",
+            <TouchableOpacity onPress={() => checkUser()} style={localStyles.button}>
+                <Text style={localStyles.buttonText}>Order</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm delete this ticket?",
             [
-                { text: "Yes", onPress: () => orderTicket() },
-                { text: "No",onPress: () => alert("Order canceled"), style: "cancel"}
+                { text: "Yes", onPress: () => deleteTicket() },
+                { text: "No",onPress: () => alert("Delete canceled"), style: "cancel"}
                 
             ]
     )} style={localStyles.button}>
-                <Text style={localStyles.buttonText}>Order</Text>
+                <Text style={localStyles.buttonText}>Delete</Text>
             </TouchableOpacity>
 
            

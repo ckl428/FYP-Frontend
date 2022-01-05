@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { View, Text, Button, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Button, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { useState, useEffect } from 'react';
 import { registerRootComponent } from 'expo';
 import { Platform, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Dialog, { DialogContent } from 'react-native-popup-dialog';
 
 
 function Login({ navigation }) {
@@ -11,7 +12,11 @@ function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
+  const [isModalVisible, setModalVisible] = useState(false);
+
+ 
+
+  const baseUrl = 'http://192.168.0.105:3000';
  
   const login = async () => {
     const url = baseUrl+'/api/user/login'
@@ -61,7 +66,8 @@ function Login({ navigation }) {
       alert(responseText)
       let user = JSON.parse(responseText)
       AsyncStorage.setItem('userName',user.name)
-      alert('Login success '+ user.name)
+      AsyncStorage.setItem('userId',user._id)
+      alert('Login success '+ user._id)
       navigation.navigate('Intro')
     }
     })
@@ -74,9 +80,13 @@ function Login({ navigation }) {
     navigation.navigate('Register')
   }
 
-  return (
 
+  return (
+    
+    
     <ScrollView style={[localStyles.container]}>
+
+      
         <Text style={[localStyles.header]}>Ticket Booking System</Text>
         <View style={[localStyles.secondContainer]}>
         <SafeAreaView >
@@ -100,7 +110,14 @@ function Login({ navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate('Intro')} style={localStyles.button}>
         <Text style={localStyles.buttonText}>Test</Text>
         </TouchableOpacity>
+       
         </View>
+
+       
+        
+
+
+    
 
     </ScrollView>
   )

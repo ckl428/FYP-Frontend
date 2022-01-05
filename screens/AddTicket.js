@@ -12,7 +12,7 @@ export default function AddTicket({ navigation }) {
   const [ticketDur,setTicketDur] = useState('');
   const [ticketCom,setTicketCom] = useState('');
   const [ticketQuota,setTicketQuota] = useState('');
-  const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
+  const baseUrl = 'http://192.168.0.105:3000'
   const addTicket = async () => {
     
     const url = baseUrl+'/api/ticket/addTicket'
@@ -38,7 +38,7 @@ export default function AddTicket({ navigation }) {
       alert(responseText);
       if(responseText=='Add Ticket Success'){
       fetchTicket();
-      navigation.navigate("Home");
+      navigation.replace('Tab_Navigator');
       }
     })
     .catch((error) => { console.warn(error); });
@@ -50,6 +50,7 @@ export default function AddTicket({ navigation }) {
         .catch((error) => console.error(error))
         .finally(() => console.log('success'));
   }
+
     return (
       <ScrollView style={[localStyles.container]}>
       <Text style={[localStyles.header]}>Add new Ticket</Text>

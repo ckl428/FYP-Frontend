@@ -1,15 +1,38 @@
 import React from 'react'
-import { View, Text, StyleSheet,ScrollView,SafeAreaView,TextInput } from 'react-native'
+import { View, Text, StyleSheet,ScrollView,SafeAreaView,TextInput, Alert } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Setting({ navigation }) {
+export default function Setting({ navigation,route }) {
   const [ticketName,setTicketName] = useState('');
+  const [user,setUser] = useState('')
+  const [userId,setUserId] = useState('')
 
+  
+  const getUserInfo = async () =>{
+    await AsyncStorage.getItem('userName').then((value)=>{
+        setUser(value)
+    })
+    await AsyncStorage.getItem('userId').then((value)=>{
+        setUserId(value)
+    })
+}
+ useEffect(() => {
+        getUserInfo()
+
+ }, []);
   const logout = ()=>{
+    
     AsyncStorage.setItem('userName','')
+    AsyncStorage.setItem('userId','')
     navigation.navigate('Login')
+  }
+
+  const myOrder = () =>{
+      navigation.navigate('MyOrder', {
+        pUserId:userId 
+    });
   }
     return (
       <ScrollView style={[localStyles.container]}>
@@ -20,12 +43,18 @@ export default function Setting({ navigation }) {
       <Text style={localStyles.buttonText}>Add Ticket(Admin)</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => alert('My account')} style={localStyles.button}>
+      <TouchableOpacity onPress={() => myOrder()} style={localStyles.button}>
       <Text style={localStyles.buttonText}>My Account</Text>
       </TouchableOpacity>
 
 
-      <TouchableOpacity onPress={() => logout()} style={localStyles.button}>
+      <TouchableOpacity onPress={() => Alert.alert("Confirmation","Are you sure to logout?",
+            [
+                { text: "Yes", onPress: () => logout() },
+                { text: "No",onPress: () => alert("Logout cancel"), style: "cancel"}
+                
+            ]
+    )} style={localStyles.button}>
       <Text style={localStyles.buttonText}>Logout</Text>
       </TouchableOpacity>
       </View>

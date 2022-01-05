@@ -7,6 +7,7 @@ import Intro from "../pages/Intro";
 import Tab_Navigator from "./Tab_Navigator";
 import AddTicket from "../screens/AddTicket";
 import Detail from "../screens/Detail";
+import MyOrder from "../screens/MyOrder";
 
 
 
@@ -33,6 +34,9 @@ function App_Navigator() {
   );
   const detailComponent = (navigation,route) => (
     <Detail navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const myOrderComponent = (navigation,route) => (
+    <MyOrder navigation={navigation.navigation} route={navigation.route}/>
   );
 
  
@@ -67,6 +71,11 @@ function App_Navigator() {
         <Stack.Screen
           name="Detail"
           component={detailComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="MyOrder"
+          component={myOrderComponent}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

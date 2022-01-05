@@ -6,71 +6,45 @@ import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AnimatedLottieView from 'lottie-react-native';
 
-
-
-
-
-export default function Home({ navigation }) {
-  
-  const [user,setUser] = useState('')
-  const [userId,setUserId] = useState('')
-  const [data,setData] = useState([]);
-  const [search,setSearch] = useState('');
-  const [loading,setLoading] = useState(true)
-
+export default function MyOrder({ navigation,route }) {
+    const [user,setUser] = useState('')
+    const [userId,setUserId] = useState('')
+    const [data,setData] = useState([]);
+    const {pUserId}  = route.params;
+    const [loading,setLoading] = useState(true)
+    
+    const getUserInfo = async () =>{
+        await AsyncStorage.getItem('userName').then((value)=>{
+            setUser(value)
+        })
+        await AsyncStorage.getItem('userId').then((value)=>{
+            setUserId(value)
+        })
+    }
     useEffect(() => {
-      
-      AsyncStorage.getItem('userName').then((value)=>{
-        setUser(value)
-        console.log('saved user', user)
-      })
-      AsyncStorage.getItem('userId').then((value)=>{
-        setUserId(value)
-        console.log('saved user id', userId)
-      })
-     
-      fetchTicket()
-      
-    }, []);
+        getUserInfo()
+        fetchOrder()
+      }, []);
+    
+      const baseUrl = 'http://192.168.0.105:3000'
+      const fetchOrder = async () =>{
+        console.log('before id', pUserId)
+        const fetchURL = baseUrl+'/api/ticket/getOrder/'+pUserId
+        await fetch(fetchURL)
+            .then((response) => response.json())
+            .then((json) => setData(json))
+            .catch((error) => console.error(error))
+            .finally(() => setLoading(false));
+      }
 
-  const baseUrl = 'http://192.168.0.105:3000';
-
-  const fetchTicket = () =>{
-    fetch(baseUrl+'/api/ticket/getTicket')
-        .then((response) => response.json())
-        .then((json) => setData(json))
-        .catch((error) => console.error(error))
-        .finally(() => setLoading(false));
-  }
-  
-  const filteredData = 
-  search?data.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase())):data
-
-  const currentUser = user?user:"Guest"
   let content  = 
   <FlatList
     style={{}}
-    data={filteredData}
+    data={data}
     keyExtractor={item => item._id}
     refreshing={true}
-    
     renderItem={({ item }) => (
     <Card>
-      <TouchableOpacity onPress={()=>{
-      navigation.navigate('Detail', {
-      _id: item._id,
-      paramUserId:userId,
-      name: item.name,
-      price: item.price,
-      start:item.start,
-      dest:item.dest,
-      duration:item.duration,
-      company:item.company,
-      image: item.image,
-      quota:item.quota,
-    });
-  }}
-  >
   <Image
   style={localStyles.image}
   source={{
@@ -78,45 +52,20 @@ export default function Home({ navigation }) {
   }}
   />
   <Text style={localStyles.contents}>{item.start} ------- {item.dest} </Text>
-</TouchableOpacity>
+
 </Card>
 )}
 />
-  
-  return (
-       
+    return (
         <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
-        <Text style={localStyles.text}>Hello {currentUser}</Text>
-        <Card>
-        <View style={{flexDirection:'row', }}>
-        <TextInput 
-        placeholder='Where you want to go?'
-        keyboardType="default"
-        onChangeText={search => setSearch(search)} 
-        defaultValue={search}
-        ></TextInput>
-        <View style={{flexDirection:'row',marginLeft: 'auto',  marginHorizontal:4,
-            marginVertical:6}}>
-              <TouchableOpacity onPress={()=>{
-                setSearch('')
-              }}>
-        <Text>X</Text>
-        </TouchableOpacity>
-        </View>
+         <Text style={localStyles.text}>My Order</Text>
         
-        </View>
-        </Card>
         
         {loading?<AnimatedLottieView source={require('../loading.json')} autoPlay loop/>:content}    
         </SafeAreaView>
-    );
-  }
-
-  
-
-
-  
-  const localStyles = StyleSheet.create({
+    )
+}
+const localStyles = StyleSheet.create({
     container: {
       height: '100%',
       backgroundColor: '#ECF0F1',
@@ -184,4 +133,3 @@ export default function Home({ navigation }) {
       borderRadius:6
     },
   });
-  

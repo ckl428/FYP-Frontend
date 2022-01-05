@@ -9,7 +9,8 @@ export default function Register({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status,setStatus] = useState('');
-  const baseUrl = Platform.OS === 'android' ? 'http://192.168.0.105:3000' : 'http://localhost:3000';
+
+  const baseUrl = 'http://192.168.0.105:3000'
  
   const signIn = async () => {
     
