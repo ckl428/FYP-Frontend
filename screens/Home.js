@@ -1,23 +1,26 @@
 import React from 'react'
-import { View, Text, StyleSheet,FlatList,ScrollView,Image, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet,FlatList,ScrollView,Image, SafeAreaView, } from 'react-native'
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useRef } from 'react';
 import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AnimatedLottieView from 'lottie-react-native';
+import SelectDropdown from 'react-native-select-dropdown'
 
 
 
 
 
 export default function Home({ navigation }) {
-  
+  const countries = ["Egypt", "Canada", "Australia", "Ireland"]
   const [user,setUser] = useState('')
   const [userId,setUserId] = useState('')
   const [data,setData] = useState([]);
   const [search,setSearch] = useState('');
+  const [countryFilter,setCountryFilter] = useState('');
   const [loading,setLoading] = useState(true)
-
+  const dropdownRef = useRef({});  
+  
     useEffect(() => {
       
       AsyncStorage.getItem('userName').then((value)=>{
@@ -30,7 +33,8 @@ export default function Home({ navigation }) {
       })
      
       fetchTicket()
-      
+      console.log('data', country)
+      dropdownRef.current.reset()
     }, []);
 
   const baseUrl = 'http://192.168.0.105:3000';
@@ -42,10 +46,13 @@ export default function Home({ navigation }) {
         .catch((error) => console.error(error))
         .finally(() => setLoading(false));
   }
+
+  const country = data.map(country => country.name);
+  
   
   const filteredData = 
-  search?data.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase())):data
-
+  search||countryFilter?data.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase()||countryFilter.toLocaleLowerCase())):data
+  //countryFilter?data.filter((item)=>item.name.toLowerCase().includes(countryFilter.toLowerCase())):data
   const currentUser = user?user:"Guest"
   let content  = 
   <FlatList
@@ -87,6 +94,23 @@ export default function Home({ navigation }) {
        
         <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
         <Text style={localStyles.text}>Hello {currentUser}</Text>
+        <Card>
+        <View style={{}}>
+        <Text style={localStyles.contents}>Search by country</Text>
+        <SelectDropdown
+	        data={[... new Set(country)]}
+          defaultButtonText='All'
+          ref={dropdownRef} 
+	        onSelect={(selectedItem, index) => {
+		     
+          setCountryFilter(selectedItem);
+          console.log(countryFilter, index)
+	        }}
+        />
+          </View>
+       
+        </Card>
+        
         <Card>
         <View style={{flexDirection:'row', }}>
         <TextInput 
