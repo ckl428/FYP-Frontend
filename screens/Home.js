@@ -137,6 +137,7 @@ let keywordsSearch =
 <View style={{flexDirection:'row', }}>
 <TextInput 
   placeholder='Where you want to go?'
+  placeholderTextColor="#b3cddf" 
   keyboardType="default"
   onChangeText={search => setSearch(search)} 
   defaultValue={search}

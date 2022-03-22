@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '../layout/Card';
 import {Picker} from '@react-native-picker/picker';
 
-export default function UpdateOrder({ navigation,route }) {
+export default function DeleteOrder({ navigation,route }) {
   const [ticketName,setTicketName] = useState('');
   const [user,setUser] = useState('')
   const [userId,setUserId] = useState('')
@@ -73,6 +73,30 @@ const getSource = (name) =>{
         .finally(() => console.log('record',record))
   }
 
+
+  const deleteOrder = async (id) =>{
+    const url = baseUrl+'/api/ticket/deleteOrder'
+    console.log('id',id)
+    await fetch(url,{
+      method:'POST',
+      headers:{
+        'Accept':'application/json',
+        'Content-type':'application/json'
+      },
+      body: JSON.stringify({
+        _id:id
+      })
+    }
+    )
+    .then((response) => response.text())
+    .then((responseText) => { 
+      alert(responseText);
+      if(responseText=='Delete success'){
+        navigation.replace('Tab_Navigator')
+      }
+      })
+    .catch((error) => { console.warn(error); });
+     }
   
  let content  = 
 
@@ -138,6 +162,7 @@ const getSource = (name) =>{
  <Text>Customer: {item.customerName}</Text>
  <Text>Gender: {item.gender}</Text>
  <Text>Passport: {item.passport}</Text>
+ <Text>id: {item._id}</Text>
  </TouchableOpacity>
  </Card>
  )}
@@ -166,28 +191,13 @@ refreshing={true}
 
 renderItem={({ item }) => (
 <Card>
-  <TouchableOpacity onPress={()=>{
-  navigation.navigate('UpdateOrderForm',{
-    _id: item._id,
-    paramUserId:userId,
-    name: item.name,
-    customerName:item.customerName,
-    pPassport:item.passport,
-    price: item.price,
-    start:item.start,
-    dest:item.dest,
-    duration:item.duration,
-    company:item.company,
-    quota:item.quota,
-    departureTime:item.departureTime,
-    arrivalTime:item.arrivalTime,
-    pDepartureDate:item.departureDate,
-    pAirClass:item.airClass,
-    pMeal:item.meal,
-    pGender:item.gender,
-
-  })
-}}
+<TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm cancel this order?",
+     [
+         { text: "Yes", onPress: () => deleteOrder(item._id) },
+         { text: "No",onPress: () => alert("Delete canceled"), style: "cancel"}
+         
+     ]
+      )}
 >
 <View style={{flexDirection:"row", justifyContent:'space-between'}}>
 <View>
@@ -219,6 +229,7 @@ renderItem={({ item }) => (
  <Text>Customer: {item.customerName}</Text>
  <Text>Gender: {item.gender}</Text>
  <Text>Passport: {item.passport}</Text>
+ <Text>id: {item._id}</Text>
 
 </TouchableOpacity>
 </Card>
@@ -232,7 +243,7 @@ renderItem={({ item }) => (
     return (
       <SafeAreaView style={[localStyles.container]}>
       
-      <Text style={[localStyles.header]}>Update Order Record</Text>
+      <Text style={[localStyles.header]}>Delete Order Record</Text>
       <View style={[localStyles.secondContainer]}>
       
       

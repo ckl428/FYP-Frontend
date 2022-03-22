@@ -1,9 +1,11 @@
 import React from 'react'
-import { View, Text, StyleSheet,FlatList,ScrollView,Image, Alert,Button } from 'react-native'
+import { View, Text, StyleSheet,FlatList,ScrollView,Image, Alert,Button,TextInput } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { add } from 'react-native-reanimated';
 
 
 export default function Detail({ route,navigation }) {
@@ -13,6 +15,53 @@ export default function Detail({ route,navigation }) {
     const [user,setUser] = useState('')
     const [userId, setUserId] = useState('')
     const [role, setRole] = useState('')
+    const [showUpdate,setShowUpdate] = useState(false)
+
+    const [updateCountry,setUpdateCountry] = useState(name)
+    const [updatePrice,setUpdatePrice] = useState(price)
+    const [updateStart,setUpdateStart] = useState(start)
+    const [updateDestination,setUpdateDestation] = useState(dest)
+    const [updateDepartureTime,setUpdateDepartureTime] = useState(departureTime)
+    const [updateArrivalTime,setUpdateArrivalTime] = useState(arrivalTime)
+    const [updateCompany,setUpdateCompany] = useState(company)
+    const [updateQuota,setUpdateQuota] = useState(quota)
+    const [ticketDepartureTime, setTicketDepartureTime] = useState(departureTime)
+    const [ticketArrivalTime, setTicketArrivalTime] = useState(arrivalTime)
+    const [isDepartureVisible, setDepartureVisibility] = useState(false);
+    const [isArrivalVisible, setArrivalVisibility] = useState(false);
+  
+    const showDeparturePicker = () => {
+      setDepartureVisibility(true);
+    };
+  
+    const hideDeparturePicker = () => {
+      setDepartureVisibility(false);
+    };
+  
+    const showArrivalPicker = () => {
+      setArrivalVisibility(true);
+    };
+  
+    const hideArrivalPicker = () => {
+      setArrivalVisibility(false);
+    };
+    const handleDeparture = async (time) => {
+      var trimTime =  JSON.stringify(time).substring(12,17)
+      
+       setUpdateDepartureTime(trimTime)
+        console.log("Departure time has been picked: ", ticketDepartureTime);
+      hideDeparturePicker();
+    };
+  
+    const handleArrival = async (time) => {
+      var trimTime =  JSON.stringify(time).substring(12,17)
+      
+       setUpdateArrivalTime(trimTime)
+        console.log("Arrival time has been picked: ", ticketArrivalTime);
+      hideArrivalPicker();
+    };
+    
+
     const fetchTicket = () =>{
       fetch(baseUrl+'/api/ticket/getTicket')
           .then((response) => response.json())
@@ -50,6 +99,7 @@ export default function Detail({ route,navigation }) {
     useEffect(() => {
         getUserInfo()
         fetchTicket()
+        console.log('Role', role)
       }, []);
     
     const { _id,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
@@ -94,9 +144,200 @@ export default function Detail({ route,navigation }) {
         departureTime:departureTime,
         arrivalTime:arrivalTime,
       });
-    
      }
+    const confirmUpdate = () =>{
+      Alert.alert("Confirmation","Confirm update this ticket?",
+     [
+         { text: "Yes", onPress: () => updateTicket() },
+         { text: "No",onPress: () => alert("Update canceled"), style: "cancel"}
+         
+     ]
+      )
+    }
+    let dur = ''
+    let totalHour = ''
+    const getDuration = () =>{
+
+      let departHour = updateDepartureTime||departureTime
+      let trimDepartHour =  departHour.substring(0,2)
+      let arrivalHour = updateArrivalTime||arrivalTime
+      let trimArrivalHour = arrivalHour.substring(0,2)
+      
+      totalHour = trimArrivalHour-trimDepartHour
+      //let totalMin = arrivalMin-departMin
+      if(totalHour<0)
+      totalHour*=-1
+      if(arrivalHour<=departHour)
+      totalHour=24-totalHour
+      //if(totalMin<0)
+      //totalMin*=-1
+  
+      dur = totalHour + " Hours"
+      return dur
+    }
+    const updateTicket = async () =>{
+        const url = baseUrl+'/api/ticket/updateTicket'
+        await fetch(url,{
+          method:'POST',
+          headers:{
+            'Accept':'application/json',
+            'Content-type':'application/json'
+          },
+          body: JSON.stringify({
+            _id:_id,
+            name:updateCountry||name,
+            price:updatePrice||price,
+            start:updateStart||start,
+            dest:updateDestination||dest,
+            duration:getDuration()||duration,
+            departureTime:updateDepartureTime||departureTime,
+            arrivalTime:updateArrivalTime||arrivalTime,
+            company:updateCompany||company,
+            quota:parseInt(updateQuota)||quota,
+          })
+        }
+        )
+        .then((response) => response.text())
+        .then((responseText) => { 
+           alert('Update Success')
+          if(responseText=='Update Success')
+            navigation.replace('Tab_Navigator')
+          })
+        .catch((error) => { console.warn(error); });
+         }
    
+     let place = <TouchableOpacity onPress={() => placeOrder()} style={localStyles.button}>
+     <Text style={localStyles.buttonText}>Place Order</Text>
+ </TouchableOpacity>
+     let addCart = <TouchableOpacity onPress={() => alert('Add to cart')} style={localStyles.button}>
+     <Text style={localStyles.buttonText}>Add to cart</Text>
+     </TouchableOpacity>
+
+     let textData = <Card>
+     {/**Ticket data */}
+     <Text style = {localStyles.contents}>Counrty: {name}</Text>
+     <Text style = {localStyles.contents}>Price: ${price}</Text>
+     <Text style = {localStyles.contents}>Start Airport: {start}</Text>
+     <Text style = {localStyles.contents}>Destination Airport: {dest}</Text>
+     <Text style = {localStyles.contents}>Departure Time: {departureTime}</Text>
+     <Text style = {localStyles.contents}>Arrival Time: {arrivalTime}</Text>
+     <Text style = {localStyles.contents}>Duration: {duration}</Text>
+     <Text style = {localStyles.contents}>Flight Company: {company}</Text>
+     <Text style = {localStyles.contents}>Quota: {quota}</Text>
+   </Card>
+
+   let updateData = 
+     <ScrollView>
+            <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Country: </Text>
+            <TextInput 
+              onChangeText={updateCountry => setUpdateCountry(updateCountry)} defaultValue={name}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+           
+            <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Price: </Text>
+            <TextInput 
+              onChangeText={updatePrice => setUpdatePrice(updatePrice)} defaultValue={JSON.stringify(price)}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+
+            <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Start Airport: </Text>
+            <TextInput 
+              onChangeText={updateStart => setUpdateStart(updateStart)} defaultValue={start}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+
+            <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Destination Airport: </Text>
+            <TextInput 
+              onChangeText={updateDestination => setUpdateDestation(updateDestination)} defaultValue={dest}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+
+        <Card>
+        <View>
+        <Button title="Select Departure Time" onPress={showDeparturePicker} />
+        <DateTimePickerModal
+        isVisible={isDepartureVisible}
+        mode="time"
+        onConfirm={handleDeparture}
+        onCancel={hideDeparturePicker}
+        />
+        <Text>{updateDepartureTime?"Departure Time: " + updateDepartureTime:"Departure Time: " + departureTime}</Text>
+        </View>
+        </Card>
+
+          <Card>
+          <View>
+          <Button title="Select Arrival Time" onPress={showArrivalPicker} />
+          <DateTimePickerModal
+          isVisible={isArrivalVisible}
+          mode="time"
+          onConfirm={handleArrival}
+          onCancel={hideArrivalPicker}
+          />
+          <Text>{updateArrivalTime?"Arrival Time: " + updateArrivalTime:"Arrival Time: " + arrivalTime}</Text>
+          </View>
+          </Card>
+          <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Duration: {getDuration()||duration}</Text>
+            </View>
+          </Card>
+
+          <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Company: </Text>
+            <TextInput 
+              onChangeText={updateCompany => setUpdateCompany(updateCompany)} defaultValue={company}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+
+            <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Quota: </Text>
+            <TextInput placeholder="Input Quota"
+              onChangeText={updateQuota => setUpdateQuota(updateQuota)} defaultValue={quota+''}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+            
+     </ScrollView>
+   
+
+     let comfirmButton = <TouchableOpacity onPress={() => confirmUpdate()} style={localStyles.button}>
+    <Text style={localStyles.buttonText}>Confirm Update</Text>
+    </TouchableOpacity>
+
+     let updateButton = <TouchableOpacity onPress={() => setShowUpdate(true)} style={localStyles.button}>
+     <Text style={localStyles.buttonText}>Update</Text>
+     </TouchableOpacity>
+     let cancelButton = <TouchableOpacity onPress={() => setShowUpdate(false)} style={localStyles.button}>
+     <Text style={localStyles.buttonText}>Cancel</Text>
+     </TouchableOpacity>
 
      let removeTicket = <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm delete this ticket?",
      [
@@ -107,6 +348,8 @@ export default function Detail({ route,navigation }) {
       )} style={localStyles.button}>
          <Text style={localStyles.buttonText}>Delete</Text>
      </TouchableOpacity>
+
+
     return (
        
         <View style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
@@ -144,30 +387,13 @@ export default function Detail({ route,navigation }) {
     
         </View>
             </Card>
-            <Card>
-              {/**Ticket data */}
-              <Text style = {localStyles.contents}>Counrty: {name}</Text>
-              <Text style = {localStyles.contents}>Price: ${price}</Text>
-              <Text style = {localStyles.contents}>Start Airport: {start}</Text>
-              <Text style = {localStyles.contents}>Destination Airport: {dest}</Text>
-              <Text style = {localStyles.contents}>Departure Time: {departureTime}</Text>
-              <Text style = {localStyles.contents}>Arrival Time: {arrivalTime}</Text>
-              <Text style = {localStyles.contents}>Duration: {duration} Hours</Text>
-              <Text style = {localStyles.contents}>Flight Company: {company}</Text>
-              <Text style = {localStyles.contents}>Quota: {quota}</Text>
             
-              
-            </Card>
-            
-      
-            
-            <TouchableOpacity onPress={() => placeOrder()} style={localStyles.button}>
-                <Text style={localStyles.buttonText}>Place Order</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => alert('Add to cart')} style={localStyles.button}>
-                <Text style={localStyles.buttonText}>Add to cart</Text>
-            </TouchableOpacity>
-
+           
+            {showUpdate?updateData:textData}
+            {place}
+            {addCart}
+            {showUpdate&&role=='admin'?comfirmButton:null}
+            {showUpdate&&role=='admin'?updateButton:null}
             {role=='admin'?removeTicket:null}
             
 
@@ -229,7 +455,7 @@ const localStyles = StyleSheet.create({
     },
     button: {
       backgroundColor: "#145F95",
-      padding: 10,
+      padding: 5,
       borderRadius: 5,
       margin: '5%',
     },

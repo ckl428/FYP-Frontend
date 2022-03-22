@@ -13,6 +13,7 @@ import GuestOrder from "../screens/GuestOrder";
 import Receipt from "../screens/Receipt";
 import UpdateOrder from "../screens/UpdateOrder";
 import UpdateOrderForm from "../screens/UpdateOrderForm";
+import DeleteOrder from "../screens/DeleteOrder";
 
 
 
@@ -58,6 +59,9 @@ function App_Navigator() {
   );
   const updateOrderFormComponent = (navigation,route) => (
     <UpdateOrderForm navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const deleteOrderComponent = (navigation,route) => (
+    <DeleteOrder navigation={navigation.navigation} route={navigation.route}/>
   );
 
  
@@ -122,6 +126,11 @@ function App_Navigator() {
         <Stack.Screen
           name="UpdateOrderForm"
           component={updateOrderFormComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DeleteOrder"
+          component={deleteOrderComponent}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

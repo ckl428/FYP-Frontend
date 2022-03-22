@@ -58,9 +58,13 @@ export default function Setting({ navigation,route }) {
   <Text style={localStyles.buttonText}>Update Order</Text>
   </TouchableOpacity>
 
-  let deleteTic = <TouchableOpacity onPress={() => navigation.navigate('AddTicket')} style={localStyles.button}>
+  let deleteTic = <TouchableOpacity onPress={() => navigation.navigate('DeleteOrder')} style={localStyles.button}>
   <Text style={localStyles.buttonText}>Delete Order</Text>
   </TouchableOpacity>
+
+let register = <TouchableOpacity onPress={() => navigation.navigate('Register')} style={localStyles.button}>
+<Text style={localStyles.buttonText}>Register</Text>
+</TouchableOpacity>
 
   let myAccount = <TouchableOpacity onPress={() => myOrder()} style={localStyles.button}>
   <Text style={localStyles.buttonText}>My Account</Text>
@@ -87,8 +91,9 @@ export default function Setting({ navigation,route }) {
       
       {user?null:login}
       {role=='admin'?addTic:null}
-      {updateTic}
-      {deleteTic}
+      {role=='admin'?updateTic:null}
+      {role=='admin'?deleteTic:null}
+      {user?null:register}
       {user?myAccount:null}
       {checkOrder}
       {user?lgout:null}

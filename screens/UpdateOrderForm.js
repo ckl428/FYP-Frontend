@@ -90,9 +90,8 @@ export default function UpdateOrderForm({ route,navigation }) {
         )
         .then((response) => response.text())
         .then((responseText) => { 
+           alert('Update Success')
           if(responseText=='Update Success')
-            console.log('Update')
-            
             navigation.replace('Tab_Navigator')
           })
         .catch((error) => { console.warn(error); });

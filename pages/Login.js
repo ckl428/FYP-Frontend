@@ -82,6 +82,15 @@ function Login({ navigation }) {
     navigation.navigate('Register')
   }
 
+  const guestLogin = () =>{
+    setEmail('');
+    setPassword('');
+    AsyncStorage.setItem('userName','')
+    AsyncStorage.setItem('userId','')
+    AsyncStorage.setItem('role','')
+    navigation.navigate('Intro')
+  }
+
 
   return (
     
@@ -102,14 +111,17 @@ function Login({ navigation }) {
             placeholderTextColor="#b3cddf" >
           </TextInput>
         </SafeAreaView>
+       
         <TouchableOpacity onPress={() => goRegister()} style={localStyles.button}>
         <Text style={localStyles.buttonText}>Create Account</Text>
         </TouchableOpacity>
+       
         <TouchableOpacity onPress={() => login()} style={localStyles.button}>
         <Text style={localStyles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Intro')} style={localStyles.button}>
-        <Text style={localStyles.buttonText}>Test</Text>
+        
+        <TouchableOpacity onPress={() => guestLogin()} style={localStyles.button}>
+        <Text style={localStyles.buttonText}>Guest</Text>
         </TouchableOpacity>
        
         </View>

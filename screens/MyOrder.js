@@ -65,34 +65,38 @@ export default function MyOrder({ navigation,route }) {
       }}
       >
       <View style={{flexDirection:"row", justifyContent:'space-between'}}>
-      <View>
-      <Image
-              source={require('../assets/Images/Flag/HongKong.png')}
-              style={{width:40,height:22.5}}
-      />
-      <Text style={localStyles.contents}>{item.start}</Text>
-      <Text style={localStyles.contents}>{item.departureTime}</Text>
-      </View>
-      <View>
-      <Image
-          source={require('../assets/airplane.png')}
-          style={{width:50,height:40}}
-        />
-      <Text>{item.duration + " Hours"}</Text>
-      </View>
+ <View>
+ <Image
+         source={require('../assets/Images/Flag/HongKong.png')}
+         style={{width:40,height:22.5}}
+ />
+ <Text style={localStyles.contents}>{item.start}</Text>
+ <Text style={localStyles.contents}>{item.departureTime}</Text>
+ </View>
+ <View>
+ <Image
+     source={require('../assets/airplane.png')}
+     style={{width:50,height:40}}
+   />
+ <Text>{item.duration}</Text>
+ </View>
+ 
+ <View>
+ <Image
+         source={getSource(item.name)}
+         style={{width:40,height:22.5}}
+ />
+ <Text style={localStyles.contents}>{item.dest}</Text>
+ <Text style={localStyles.contents}>{item.arrivalTime}</Text>
+ </View>
+ </View>
+ <View style={{borderBottomColor: 'black', borderBottomWidth: 1,}}/>
+ <Text>Customer: {item.customerName}</Text>
+ <Text>Gender: {item.gender}</Text>
+ <Text>Passport: {item.passport}</Text>
+ </TouchableOpacity>
+
       
-      <View>
-      <Image
-              source={getSource(item.name)}
-              style={{width:40,height:22.5}}
-      />
-      <Text style={localStyles.contents}>{item.dest}</Text>
-      <Text style={localStyles.contents}>{item.arrivalTime}</Text>
-      </View>
-      
-      </View>
-      
-      </TouchableOpacity>
       </Card>
       )}
       />
