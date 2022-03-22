@@ -24,7 +24,8 @@ export default function Register({ navigation }) {
       body: JSON.stringify({
         name:name,
         email:email,
-        password:password
+        password:password,
+        role:'member',
       })
     }
     )

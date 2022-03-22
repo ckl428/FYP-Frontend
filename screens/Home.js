@@ -6,23 +6,25 @@ import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AnimatedLottieView from 'lottie-react-native';
 import SelectDropdown from 'react-native-select-dropdown'
+import {Picker} from '@react-native-picker/picker';
+
 
 
 
 
 
 export default function Home({ navigation }) {
-  const countries = ["Egypt", "Canada", "Australia", "Ireland"]
   const [user,setUser] = useState('')
   const [userId,setUserId] = useState('')
   const [data,setData] = useState([]);
   const [search,setSearch] = useState('');
-  const [countryFilter,setCountryFilter] = useState('');
+  const [selectedMethod,setSelectedMethod] = useState('Keywords')
   const [loading,setLoading] = useState(true)
-  const dropdownRef = useRef({});  
+  const dropdownRef = useRef({}); 
   
     useEffect(() => {
       
+
       AsyncStorage.getItem('userName').then((value)=>{
         setUser(value)
         console.log('saved user', user)
@@ -33,8 +35,7 @@ export default function Home({ navigation }) {
       })
      
       fetchTicket()
-      console.log('data', country)
-      dropdownRef.current.reset()
+      
     }, []);
 
   const baseUrl = 'http://192.168.0.105:3000';
@@ -46,12 +47,28 @@ export default function Home({ navigation }) {
         .catch((error) => console.error(error))
         .finally(() => setLoading(false));
   }
+ 
+  const getSource = (name) =>{
+    switch(name){
+      case "Hong Kong":
+        return require('../assets/Images/Flag/HongKong.png')
+      case "China":
+        return require('../assets/Images/Flag/China.png')
+      case "Japan":
+        return require('../assets/Images/Flag/Japan.png')
+      case "Dubai":
+        return require('../assets/Images/Flag/Dubai.png')
+      case "South Korea":
+        return require('../assets/Images/Flag/SouthKorea.png')
+    }
+  }
 
   const country = data.map(country => country.name);
   
+
   
   const filteredData = 
-  search||countryFilter?data.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase()||countryFilter.toLocaleLowerCase())):data
+  search?data.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase())):data
   //countryFilter?data.filter((item)=>item.name.toLowerCase().includes(countryFilter.toLowerCase())):data
   const currentUser = user?user:"Guest"
   let content  = 
@@ -60,7 +77,6 @@ export default function Home({ navigation }) {
     data={filteredData}
     keyExtractor={item => item._id}
     refreshing={true}
-    
     renderItem={({ item }) => (
     <Card>
       <TouchableOpacity onPress={()=>{
@@ -75,60 +91,117 @@ export default function Home({ navigation }) {
       company:item.company,
       image: item.image,
       quota:item.quota,
+      departureTime:item.departureTime,
+      arrivalTime:item.arrivalTime,
     });
   }}
   >
-  <Image
-  style={localStyles.image}
-  source={{
-  uri: item.image,
-  }}
-  />
-  <Text style={localStyles.contents}>{item.start} ------- {item.dest} </Text>
+  <View style={{flexDirection:"row", justifyContent:'space-between'}}>
+    <View>
+    
+    
+    <Image
+        source={require('../assets/Images/Flag/HongKong.png')}
+        style={{width:40,height:22.5}}
+    />
+    <Text style={localStyles.contents}>{item.start}</Text>
+    <Text style={localStyles.contents}>{item.departureTime}</Text>
+    
+    </View>
+    <View>
+    <Image
+        source={require('../assets/airplane.png')}
+        style={{width:50,height:40}}
+      />
+    <Text>{item.duration}</Text>
+    </View>
+   
+    <View>
+    <Image
+        source={getSource(item.name)}
+        style={{width:40,height:22.5}}
+    />
+    <Text style={localStyles.contents}>{item.dest}</Text>
+    <Text style={localStyles.contents}>{item.arrivalTime}</Text>
+    </View>
+    
+  </View>
+  
 </TouchableOpacity>
 </Card>
 )}
 />
-  
-  return (
-       
-        <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
-        <Text style={localStyles.text}>Hello {currentUser}</Text>
-        <Card>
-        <View style={{}}>
-        <Text style={localStyles.contents}>Search by country</Text>
-        <SelectDropdown
-	        data={[... new Set(country)]}
-          defaultButtonText='All'
-          ref={dropdownRef} 
-	        onSelect={(selectedItem, index) => {
-		     
-          setCountryFilter(selectedItem);
-          console.log(countryFilter, index)
-	        }}
-        />
-          </View>
-       
-        </Card>
-        
-        <Card>
-        <View style={{flexDirection:'row', }}>
-        <TextInput 
-        placeholder='Where you want to go?'
-        keyboardType="default"
-        onChangeText={search => setSearch(search)} 
-        defaultValue={search}
-        ></TextInput>
+
+
+let keywordsSearch =  
+<View style={{flexDirection:'row', }}>
+<TextInput 
+  placeholder='Where you want to go?'
+  keyboardType="default"
+  onChangeText={search => setSearch(search)} 
+  defaultValue={search}
+  ></TextInput>
         <View style={{flexDirection:'row',marginLeft: 'auto',  marginHorizontal:4,
             marginVertical:6}}>
               <TouchableOpacity onPress={()=>{
+               
                 setSearch('')
               }}>
         <Text>X</Text>
         </TouchableOpacity>
         </View>
-        
         </View>
+  
+  
+
+  let regionSearch =   
+  <View style={{flexDirection:'row', }}>
+      <SelectDropdown
+  data={[... new Set(country)]}
+  defaultButtonText='All'
+  ref={dropdownRef} 
+  onSelect={(selectedItem, index) => {
+  
+  setSearch(selectedItem);
+  
+  }}
+/>
+        <View style={{flexDirection:'row',marginLeft: 'auto',  marginHorizontal:4,
+            marginVertical:6}}>
+              <TouchableOpacity onPress={()=>{
+                dropdownRef.current.reset()
+                setSearch('')
+              }}>
+        <Text>X</Text>
+        </TouchableOpacity>
+        </View>
+        </View>
+  
+  return (
+       
+        <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
+        
+        <Text style={localStyles.text}>Welcome Back, {currentUser}</Text>
+        <Card>
+        <View style={{}}>
+        <Text>Search By:</Text>
+           <Picker
+            selectedValue={selectedMethod}
+            onValueChange={(itemValue, itemIndex) =>
+            setSelectedMethod(itemValue)
+            }>
+            <Picker.Item label="Keywords" value="Keywords" />
+            <Picker.Item label="Region" value="Region" />
+            </Picker>
+          
+          </View>
+       
+        </Card>
+        
+        <Card>
+        
+        {selectedMethod=='Keywords'?keywordsSearch:regionSearch}
+        
         </Card>
         
         {loading?<AnimatedLottieView source={require('../loading.json')} autoPlay loop/>:content}    
@@ -150,8 +223,8 @@ export default function Home({ navigation }) {
         color:'#14956f'
     },
     contents:{
-      fontSize:18,
-        color:'#ff0095'
+      fontSize:16,
+        color:'#000000'
     },
     header: {
       textAlign: 'center',

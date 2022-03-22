@@ -5,6 +5,7 @@ import { registerRootComponent } from 'expo';
 import { Platform, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Dialog, { DialogContent } from 'react-native-popup-dialog';
+import Card from '../layout/Card';
 
 
 function Login({ navigation }) {
@@ -63,11 +64,12 @@ function Login({ navigation }) {
       return
     }
     else{
-      alert(responseText)
+      //alert(responseText)
       let user = JSON.parse(responseText)
       AsyncStorage.setItem('userName',user.name)
       AsyncStorage.setItem('userId',user._id)
-      alert('Login success '+ user._id)
+      AsyncStorage.setItem('role',user.role)
+      alert('Login success ')
       navigation.navigate('Intro')
     }
     })
@@ -83,11 +85,10 @@ function Login({ navigation }) {
 
   return (
     
-    
+   
     <ScrollView style={[localStyles.container]}>
-
-      
         <Text style={[localStyles.header]}>Ticket Booking System</Text>
+        <Card>
         <View style={[localStyles.secondContainer]}>
         <SafeAreaView >
 
@@ -102,7 +103,7 @@ function Login({ navigation }) {
           </TextInput>
         </SafeAreaView>
         <TouchableOpacity onPress={() => goRegister()} style={localStyles.button}>
-        <Text style={localStyles.buttonText}>Go to Create Account</Text>
+        <Text style={localStyles.buttonText}>Create Account</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => login()} style={localStyles.button}>
         <Text style={localStyles.buttonText}>Login</Text>
@@ -112,14 +113,9 @@ function Login({ navigation }) {
         </TouchableOpacity>
        
         </View>
-
-       
-        
-
-
-    
-
+        </Card>
     </ScrollView>
+    
   )
 }
 const localStyles = StyleSheet.create({

@@ -2,10 +2,9 @@ import React from 'react'
 import { View, Text, StyleSheet,FlatList,ScrollView,Image, Alert,Button } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
-import { useRoute,useNavigation } from '@react-navigation/native';
 import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DatePicker from 'react-native-date-picker'
+
 
 export default function Detail({ route,navigation }) {
 
@@ -13,8 +12,7 @@ export default function Detail({ route,navigation }) {
 
     const [user,setUser] = useState('')
     const [userId, setUserId] = useState('')
-    const [date, setDate] = useState(new Date())
-    const [open, setOpen] = useState(false)
+    const [role, setRole] = useState('')
     const fetchTicket = () =>{
       fetch(baseUrl+'/api/ticket/getTicket')
           .then((response) => response.json())
@@ -29,6 +27,24 @@ export default function Detail({ route,navigation }) {
         await AsyncStorage.getItem('userId').then((value)=>{
             setUserId(value)
         })
+        await AsyncStorage.getItem('role').then((value)=>{
+          setRole(value)
+      })
+     
+    }
+    const getSource = (name) =>{
+      switch(name){
+        case "Hong Kong":
+          return require('../assets/Images/Flag/HongKong.png')
+        case "China":
+          return require('../assets/Images/Flag/China.png')
+        case "Japan":
+          return require('../assets/Images/Flag/Japan.png')
+        case "Dubai":
+          return require('../assets/Images/Flag/Dubai.png')
+        case "South Korea":
+          return require('../assets/Images/Flag/SouthKorea.png')
+      }
     }
 
     useEffect(() => {
@@ -36,43 +52,8 @@ export default function Detail({ route,navigation }) {
         fetchTicket()
       }, []);
     
-    const { _id,paramUserId,name,price,start,dest,duration,company,image,quota} = route.params;
+    const { _id,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
     //console.log('image', image)
-
-    const orderTicket = async () =>{
-        console.log('selected user', user)
-        console.log('selected userID', userId)
-        console.log('selected ticketID',_id)
-        const url = baseUrl+'/api/ticket/orderTicket'
-        await fetch(url,{
-          method:'POST',
-          headers:{
-            'Accept':'application/json',
-            'Content-type':'application/json'
-          },
-          body: JSON.stringify({
-            _id:_id,
-            user:user,
-            userId:userId,
-            name:name,
-            price:price,
-            start:start,
-            dest:dest,
-            duration:duration,
-            company:company,
-            image:image,
-            quota:quota
-          })
-        }
-        )
-        .then((response) => response.text())
-        .then((responseText) => { 
-          alert(responseText);
-          if(responseText=='Add Order Success')
-            navigation.replace('Tab_Navigator')
-          })
-        .catch((error) => { console.warn(error); });
-         }
 
     const deleteTicket = async () =>{
     const url = baseUrl+'/api/ticket/deleteTicket'
@@ -96,55 +77,99 @@ export default function Detail({ route,navigation }) {
       })
     .catch((error) => { console.warn(error); });
      }
-     const checkUser = () =>{
-        if(!user)
-        alert('Please login first')
-        else
-        Alert.alert("Confirmation","Confirm order this ticket?",
-        [
-            { text: "Yes", onPress: () => 
-            orderTicket() 
-            },
-            { text: "No",onPress: () => alert("Order canceled"), style: "cancel"}
-            
-        ]
-)
+     const placeOrder = () =>{
+      
+        navigation.navigate('OrderTicket', {
+        _id: _id,
+        user:user,
+        paramUserId:userId,
+        name: name,
+        price: price,
+        start:start,
+        dest:dest,
+        duration:duration,
+        company:company,
+        image: image,
+        quota:quota,
+        departureTime:departureTime,
+        arrivalTime:arrivalTime,
+      });
+    
      }
-    //<Text style = {localStyles.contents}>Item id: {_id}</Text>
+   
+
+     let removeTicket = <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm delete this ticket?",
+     [
+         { text: "Yes", onPress: () => deleteTicket() },
+         { text: "No",onPress: () => alert("Delete canceled"), style: "cancel"}
+         
+     ]
+      )} style={localStyles.button}>
+         <Text style={localStyles.buttonText}>Delete</Text>
+     </TouchableOpacity>
     return (
        
         <View style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
             <Text style={localStyles.text}>Details Screen</Text>
+            
             <Card>
-              <Image
-                  style={localStyles.image}
-                  source={{
-                  uri: image,
-                  }}
+            <View style={{flexDirection:"row", justifyContent:'space-between'}}>
+            <View>
+    
+    
+            <Image
+              source={require('../assets/Images/Flag/HongKong.png')}
+              style={{width:40,height:22.5}}
             />
-              <Text style = {localStyles.contents}>Name: {name}</Text>
-              <Text style = {localStyles.contents}>Price: {price}</Text>
+            <Text style={localStyles.contents}>{start}</Text>
+            <Text style={localStyles.contents}>{departureTime}</Text>
+    
+            </View>
+            <View>
+            <Image
+                source={require('../assets/airplane.png')}
+                style={{width:50,height:40}}
+              />
+            <Text>{duration}</Text>
+          </View>
+   
+          <View>
+          <Image
+              source={getSource(name)}
+              style={{width:40,height:22.5}}
+          />
+          <Text style={localStyles.contents}>{dest}</Text>
+          <Text style={localStyles.contents}>{arrivalTime}</Text>
+          </View>
+    
+        </View>
+            </Card>
+            <Card>
+              {/**Ticket data */}
+              <Text style = {localStyles.contents}>Counrty: {name}</Text>
+              <Text style = {localStyles.contents}>Price: ${price}</Text>
               <Text style = {localStyles.contents}>Start Airport: {start}</Text>
               <Text style = {localStyles.contents}>Destination Airport: {dest}</Text>
-              <Text style = {localStyles.contents}>Duration: {duration}</Text>
+              <Text style = {localStyles.contents}>Departure Time: {departureTime}</Text>
+              <Text style = {localStyles.contents}>Arrival Time: {arrivalTime}</Text>
+              <Text style = {localStyles.contents}>Duration: {duration} Hours</Text>
               <Text style = {localStyles.contents}>Flight Company: {company}</Text>
               <Text style = {localStyles.contents}>Quota: {quota}</Text>
+            
+              
             </Card>
             
       
-            <TouchableOpacity onPress={() => checkUser()} style={localStyles.button}>
-                <Text style={localStyles.buttonText}>Order</Text>
+            
+            <TouchableOpacity onPress={() => placeOrder()} style={localStyles.button}>
+                <Text style={localStyles.buttonText}>Place Order</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => alert('Add to cart')} style={localStyles.button}>
+                <Text style={localStyles.buttonText}>Add to cart</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm delete this ticket?",
-            [
-                { text: "Yes", onPress: () => deleteTicket() },
-                { text: "No",onPress: () => alert("Delete canceled"), style: "cancel"}
-                
-            ]
-    )} style={localStyles.button}>
-                <Text style={localStyles.buttonText}>Delete</Text>
-            </TouchableOpacity>
+            {role=='admin'?removeTicket:null}
+            
 
            
         </View>
@@ -161,8 +186,8 @@ const localStyles = StyleSheet.create({
         color:'#14956f'
     },
     contents:{
-      fontSize:18,
-        color:'#ff0095'
+      fontSize:16,
+        color:'#000000'
     },
     header: {
       textAlign: 'center',

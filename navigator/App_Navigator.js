@@ -8,6 +8,12 @@ import Tab_Navigator from "./Tab_Navigator";
 import AddTicket from "../screens/AddTicket";
 import Detail from "../screens/Detail";
 import MyOrder from "../screens/MyOrder";
+import OrderTicket from "../screens/OrderTicket";
+import GuestOrder from "../screens/GuestOrder";
+import Receipt from "../screens/Receipt";
+import UpdateOrder from "../screens/UpdateOrder";
+import UpdateOrderForm from "../screens/UpdateOrderForm";
+
 
 
 
@@ -37,6 +43,21 @@ function App_Navigator() {
   );
   const myOrderComponent = (navigation,route) => (
     <MyOrder navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const orderTicketComponent = (navigation,route) => (
+    <OrderTicket navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const guestOrderComponent = (navigation,route) => (
+    <GuestOrder navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const receiptComponent = (navigation,route) => (
+    <Receipt navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const updateOrderComponent = (navigation,route) => (
+    <UpdateOrder navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const updateOrderFormComponent = (navigation,route) => (
+    <UpdateOrderForm navigation={navigation.navigation} route={navigation.route}/>
   );
 
  
@@ -76,6 +97,31 @@ function App_Navigator() {
         <Stack.Screen
           name="MyOrder"
           component={myOrderComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="OrderTicket"
+          component={orderTicketComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GuestOrder"
+          component={guestOrderComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Receipt"
+          component={receiptComponent}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="UpdateOrder"
+          component={updateOrderComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="UpdateOrderForm"
+          component={updateOrderFormComponent}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

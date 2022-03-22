@@ -36,32 +36,75 @@ export default function MyOrder({ navigation,route }) {
             .catch((error) => console.error(error))
             .finally(() => setLoading(false));
       }
-
-  let content  = 
-  <FlatList
-    style={{}}
-    data={data}
-    keyExtractor={item => item._id}
-    refreshing={true}
-    renderItem={({ item }) => (
-    <Card>
-  <Image
-  style={localStyles.image}
-  source={{
-  uri: item.image,
-  }}
-  />
-  <Text style={localStyles.contents}>{item.start} ------- {item.dest} </Text>
-
-</Card>
-)}
-/>
+      const getSource = (name) =>{
+        switch(name){
+          case "Hong Kong":
+            return require('../assets/Images/Flag/HongKong.png')
+          case "China":
+            return require('../assets/Images/Flag/China.png')
+          case "Japan":
+            return require('../assets/Images/Flag/Japan.png')
+          case "Dubai":
+            return require('../assets/Images/Flag/Dubai.png')
+          case "South Korea":
+            return require('../assets/Images/Flag/SouthKorea.png')
+        }
+      }
+      let content  = 
+      
+      <FlatList
+      style={{}}
+      data={data}
+      keyExtractor={item => item._id}
+      refreshing={true}
+      
+      renderItem={({ item }) => (
+      <Card>
+        <TouchableOpacity onPress={()=>{
+        alert('Hello')
+      }}
+      >
+      <View style={{flexDirection:"row", justifyContent:'space-between'}}>
+      <View>
+      <Image
+              source={require('../assets/Images/Flag/HongKong.png')}
+              style={{width:40,height:22.5}}
+      />
+      <Text style={localStyles.contents}>{item.start}</Text>
+      <Text style={localStyles.contents}>{item.departureTime}</Text>
+      </View>
+      <View>
+      <Image
+          source={require('../assets/airplane.png')}
+          style={{width:50,height:40}}
+        />
+      <Text>{item.duration + " Hours"}</Text>
+      </View>
+      
+      <View>
+      <Image
+              source={getSource(item.name)}
+              style={{width:40,height:22.5}}
+      />
+      <Text style={localStyles.contents}>{item.dest}</Text>
+      <Text style={localStyles.contents}>{item.arrivalTime}</Text>
+      </View>
+      
+      </View>
+      
+      </TouchableOpacity>
+      </Card>
+      )}
+      />
     return (
         <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
          <Text style={localStyles.text}>My Order</Text>
         
         
         {loading?<AnimatedLottieView source={require('../loading.json')} autoPlay loop/>:content}    
+        <TouchableOpacity onPress={() => navigation.goBack()} style={localStyles.button}>
+        <Text style={localStyles.buttonText}>Back</Text>
+      </TouchableOpacity>
         </SafeAreaView>
     )
 }

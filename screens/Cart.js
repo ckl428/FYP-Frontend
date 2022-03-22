@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Setting({ navigation,route }) {
+export default function Cart({ navigation,route }) {
   const [ticketName,setTicketName] = useState('');
   const [user,setUser] = useState('')
   const [userId,setUserId] = useState('')
@@ -26,73 +26,25 @@ export default function Setting({ navigation,route }) {
         getUserInfo()
 
  }, []);
-  const logout = ()=>{
-    AsyncStorage.setItem('userName','')
-    AsyncStorage.setItem('userId','')
-    navigation.navigate('Login')
-  }
+ 
+  
 
-  const myOrder = () =>{
-      navigation.navigate('MyOrder', {
-        pUserId:userId 
-    });
-  }
-
-  const guestOrder = () =>{
-    navigation.navigate('GuestOrder', {
-      pUserId:userId 
-  });
-}
+  
 
  
 
-  let login = <TouchableOpacity onPress={() => navigation.navigate('Login')} style={localStyles.button}>
-  <Text style={localStyles.buttonText}>Login</Text>
-  </TouchableOpacity>
-
-  let addTic = <TouchableOpacity onPress={() => navigation.navigate('AddTicket')} style={localStyles.button}>
-  <Text style={localStyles.buttonText}>Add Ticket</Text>
-  </TouchableOpacity>
-
-  let updateTic = <TouchableOpacity onPress={() => navigation.navigate('UpdateOrder')} style={localStyles.button}>
-  <Text style={localStyles.buttonText}>Update Order</Text>
-  </TouchableOpacity>
-
-  let deleteTic = <TouchableOpacity onPress={() => navigation.navigate('AddTicket')} style={localStyles.button}>
-  <Text style={localStyles.buttonText}>Delete Order</Text>
-  </TouchableOpacity>
-
-  let myAccount = <TouchableOpacity onPress={() => myOrder()} style={localStyles.button}>
-  <Text style={localStyles.buttonText}>My Account</Text>
-  </TouchableOpacity>
-  let checkOrder =  <TouchableOpacity onPress={() => guestOrder()} style={localStyles.button}>
-  <Text style={localStyles.buttonText}>Check My Order</Text>
-  </TouchableOpacity>
-
-  let lgout =  <TouchableOpacity onPress={() => Alert.alert("Confirmation","Are you sure to logout?",
-  [
-    { text: "Yes", onPress: () => logout() },
-    { text: "No",onPress: () => alert("Logout cancel"), style: "cancel"}
-    
-  ]
-  )} style={localStyles.button}>
-<Text style={localStyles.buttonText}>Logout</Text>
-  </TouchableOpacity>
+  
   
     return (
       <ScrollView style={[localStyles.container]}>
       
-      <Text style={[localStyles.header]}>Menu</Text>
+      <Text style={[localStyles.header]}>Shopping Cart</Text>
       <View style={[localStyles.secondContainer]}>
       
-      {user?null:login}
-      {role=='admin'?addTic:null}
-      {updateTic}
-      {deleteTic}
-      {user?myAccount:null}
-      {checkOrder}
-      {user?lgout:null}
-
+      
+      <TouchableOpacity onPress={() => navigation.goBack()} style={localStyles.button}>
+        <Text style={localStyles.buttonText}>Back</Text>
+      </TouchableOpacity>
       
       </View>
 
@@ -162,4 +114,3 @@ export default function Setting({ navigation,route }) {
       textAlign: 'center'
     },
   });
-  
