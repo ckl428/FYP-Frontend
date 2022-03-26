@@ -92,7 +92,7 @@ const getSource = (name) =>{
     .then((responseText) => { 
       alert(responseText);
       if(responseText=='Delete success'){
-        navigation.replace('Tab_Navigator')
+        navigation.replace('DeleteOrder')
       }
       })
     .catch((error) => { console.warn(error); });
@@ -109,29 +109,14 @@ const getSource = (name) =>{
  
  renderItem={({ item }) => (
  <Card>
-   <TouchableOpacity onPress={()=>{
-   navigation.navigate('UpdateOrderForm',{
-     _id: item._id,
-     paramUserId:userId,
-     name: item.name,
-     customerName:item.customerName,
-     pPassport:item.passport,
-     price: item.price,
-     start:item.start,
-     dest:item.dest,
-     duration:item.duration,
-     company:item.company,
-     quota:item.quota,
-     departureTime:item.departureTime,
-     arrivalTime:item.arrivalTime,
-     pDepartureDate:item.departureDate,
-     pAirClass:item.airClass,
-     pMeal:item.meal,
-     pGender:item.gender,
- 
-   })
- }}
- >
+   <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm cancel this order?",
+     [
+         { text: "Yes", onPress: () => deleteOrder(item._id) },
+         { text: "No",onPress: () => alert("Delete canceled"), style: "cancel"}
+         
+     ]
+      )}
+>
  <View style={{flexDirection:"row", justifyContent:'space-between'}}>
  <View>
  <Image

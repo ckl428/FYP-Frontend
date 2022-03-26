@@ -1,9 +1,10 @@
 import React from 'react'
-import { View, Text, Button, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView,Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Image,ScrollView,Alert,Modal} from 'react-native';
 import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import {Picker} from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { WebView } from 'react-native-webview';
 
 export default function OrderTicket({ route,navigation }) {
     const { _id,user,paramUserId,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
@@ -14,7 +15,9 @@ export default function OrderTicket({ route,navigation }) {
     const [meal, setMeal] = useState('No Meal');
     const [departureDate, setDepartureDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [discount,setDiscount] = useState(1);
+    const [showModal,setShowModal] = useState(false);
+    const [status,setStatus] = useState('Pending');
+
     
     const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -49,7 +52,7 @@ export default function OrderTicket({ route,navigation }) {
 
    
 
-
+   
    
   
     const baseUrl = 'http://192.168.0.105:3000'
@@ -94,7 +97,28 @@ export default function OrderTicket({ route,navigation }) {
         .then((responseText) => { 
           alert(responseText);
           if(responseText=='Add Order Success')
-            navigation.replace('Tab_Navigator')
+            navigation.navigate('Receipt',{
+              _id:_id,
+            user:(user?user:'Guest'),
+            userId:(paramUserId?paramUserId:'Guest'),
+            customerName:custName,
+            passport:passport,
+            departureDate:departureDate,
+            departureTime:departureTime,
+            arrivalTime:arrivalTime,
+            name:name,
+            price:price,
+            total:total,
+            start:start,
+            dest:dest,
+            duration:duration,
+            company:company,
+            image:image,
+            quota:quota,
+            meal:meal,
+            airClass:airClass,
+            gender:selectedGender,
+            })
           })
         .catch((error) => { console.warn(error); });
          }
@@ -102,16 +126,29 @@ export default function OrderTicket({ route,navigation }) {
 
     const checkInput = () => {
       if(custName&&selectedGender&&departureDate&&airClass&&meal){
-        orderTicket()
+        console.log('All fields ok')
+        setShowModal(true)
       }
       else{
         alert('Please input all fields')
         return;
       }
-
-
     }
     let total = price*getPrice(airClass)+getPrice(meal)
+
+    const handleResponse = (data) => {
+      checkInput()
+      //HTML title
+      if(data.title === 'success'){
+        setShowModal(false);
+        console.log('Payment success')
+        orderTicket()
+      }
+      else if(data.title ==='cancel'){
+        setShowModal(false);
+        alert('Payment cancel')
+      }
+    }
     return (
       //Custoemr name, 
       <ScrollView style={[localStyles.container]}>
@@ -210,17 +247,31 @@ export default function OrderTicket({ route,navigation }) {
           
           </SafeAreaView>
           
-         
+         <View>
+           <Modal 
+           visible={showModal}
+           onRequestClose={()=>setShowModal(false)}>
+             <WebView
+             source={{uri:baseUrl}}
+             onNavigationStateChange={data=>handleResponse(data)}
+             injectedJavaScript={`
+             document.getElementById('ticketPrice').value=${price*getPrice(airClass)};
+             document.getElementById('mealPrice').value=${getPrice(meal)?getPrice(meal):0};
+             document.getElementById('memberPrice').value=${user?total-total*0.9:0};
+             document.f1.submit();
+             `}
+             />
+           </Modal>
 
-          <TouchableOpacity onPress={() => Alert.alert("Confirmation","Confirm order?",
-        [
-          { text: "Yes", onPress: () => checkInput() },
-          { text: "No",onPress: () => alert("Order cancel"), style: "cancel"}
-    
-        ]
-          )} style={localStyles.button}>
-        <Text style={localStyles.buttonText}>Order</Text>
-         </TouchableOpacity>
+           <TouchableOpacity onPress={() => checkInput()} style={localStyles.button}>
+           <Image
+            source={require('../assets/paypal.png')}
+            style={{width:260,height:50}}
+            />
+            
+            </TouchableOpacity>
+            
+         </View>
           
           
           <TouchableOpacity onPress={() => navigation.goBack()} style={localStyles.button}>

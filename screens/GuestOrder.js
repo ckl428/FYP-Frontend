@@ -79,8 +79,12 @@ renderItem={({ item }) => (
 <Text style={localStyles.contents}>{item.dest}</Text>
 <Text style={localStyles.contents}>{item.arrivalTime}</Text>
 </View>
-
 </View>
+
+<View style={{borderBottomColor: 'black', borderBottomWidth: 1,}}/>
+ <Text>Customer: {item.customerName}</Text>
+ <Text>Gender: {item.gender}</Text>
+ <Text>Passport: {item.passport}</Text>
 
 </TouchableOpacity>
 </Card>

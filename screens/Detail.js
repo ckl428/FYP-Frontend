@@ -175,6 +175,12 @@ export default function Detail({ route,navigation }) {
       dur = totalHour + " Hours"
       return dur
     }
+    const handleCancel = () =>{
+      if(role=='admin')
+        setShowUpdate(false)
+      else
+        navigation.goBack();
+    }
     const updateTicket = async () =>{
         const url = baseUrl+'/api/ticket/updateTicket'
         await fetch(url,{
@@ -326,7 +332,7 @@ export default function Detail({ route,navigation }) {
             </Card>
             
      </ScrollView>
-   
+    
 
      let comfirmButton = <TouchableOpacity onPress={() => confirmUpdate()} style={localStyles.button}>
     <Text style={localStyles.buttonText}>Confirm Update</Text>
@@ -335,7 +341,7 @@ export default function Detail({ route,navigation }) {
      let updateButton = <TouchableOpacity onPress={() => setShowUpdate(true)} style={localStyles.button}>
      <Text style={localStyles.buttonText}>Update</Text>
      </TouchableOpacity>
-     let cancelButton = <TouchableOpacity onPress={() => setShowUpdate(false)} style={localStyles.button}>
+     let cancelButton = <TouchableOpacity onPress={() => handleCancel()} style={localStyles.button}>
      <Text style={localStyles.buttonText}>Cancel</Text>
      </TouchableOpacity>
 
@@ -390,10 +396,11 @@ export default function Detail({ route,navigation }) {
             
            
             {showUpdate?updateData:textData}
-            {place}
-            {addCart}
-            {showUpdate&&role=='admin'?comfirmButton:null}
-            {showUpdate&&role=='admin'?updateButton:null}
+            {showUpdate?null:place}
+            {showUpdate?null:addCart}
+            {showUpdate?comfirmButton:null}
+            {showUpdate||role!='admin'?null:updateButton}
+            {showUpdate||role!='admin'?cancelButton:null}
             {role=='admin'?removeTicket:null}
             
 
