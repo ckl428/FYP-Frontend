@@ -4,9 +4,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { duration } from 'moment';
+import { baseUrl } from '../global_url';
 
 export default function AddTicket({ navigation }) {
+  const [ticketDepartureName,setTicketDepartureName] = useState('');
   const [ticketName,setTicketName] = useState('');
   const [ticketPrice,setTicketPrice] = useState('');
   const [ticketStart,setTicketStart] = useState('');
@@ -48,7 +49,7 @@ export default function AddTicket({ navigation }) {
       console.log("Arrival time has been picked: ", ticketArrivalTime);
     hideArrivalPicker();
   };
-  const baseUrl = 'http://192.168.0.105:3000'
+  
 
 
 
@@ -64,6 +65,7 @@ export default function AddTicket({ navigation }) {
         'Content-type':'application/json'
       },
       body: JSON.stringify({
+        deptName:ticketDepartureName,
         name:ticketName,
         price:ticketPrice,
         start:ticketStart,
@@ -116,6 +118,13 @@ export default function AddTicket({ navigation }) {
       <Text style={[localStyles.header]}>Add new Ticket</Text>
       <View style={[localStyles.secondContainer]}>
       <SafeAreaView >
+      <Card>
+        <TextInput placeholder="Departure Name"
+          onChangeText={ticketDepartureName => setTicketDepartureName(ticketDepartureName)} defaultValue={ticketDepartureName}
+          placeholderTextColor="#b3cddf"
+        >
+           </TextInput>
+        </Card>
         <Card>
         <TextInput placeholder="Destination Name"
           onChangeText={ticketName => setTicketName(ticketName)} defaultValue={ticketName}

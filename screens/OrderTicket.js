@@ -5,9 +5,10 @@ import Card from '../layout/Card';
 import {Picker} from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { WebView } from 'react-native-webview';
+import { baseUrl } from '../global_url';
 
 export default function OrderTicket({ route,navigation }) {
-    const { _id,user,paramUserId,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
+    const { _id,user,paramUserId,deptName,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
     const [custName, setCustName] = useState('');
     const [selectedGender, setSelectedGender] = useState('Male');
     const [passport, setPassport] = useState('');
@@ -16,7 +17,6 @@ export default function OrderTicket({ route,navigation }) {
     const [departureDate, setDepartureDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [showModal,setShowModal] = useState(false);
-    const [status,setStatus] = useState('Pending');
 
     
     const showDatePicker = () => {
@@ -55,7 +55,7 @@ export default function OrderTicket({ route,navigation }) {
    
    
   
-    const baseUrl = 'http://192.168.0.105:3000'
+
 
     const orderTicket = async () =>{
         console.log('selected passport', passport)
@@ -78,6 +78,7 @@ export default function OrderTicket({ route,navigation }) {
             departureDate:departureDate,
             departureTime:departureTime,
             arrivalTime:arrivalTime,
+            deptName:deptName,
             name:name,
             price:price,
             total:total,
@@ -106,6 +107,7 @@ export default function OrderTicket({ route,navigation }) {
             departureDate:departureDate,
             departureTime:departureTime,
             arrivalTime:arrivalTime,
+            deptName:deptName,
             name:name,
             price:price,
             total:total,
@@ -263,10 +265,10 @@ export default function OrderTicket({ route,navigation }) {
              />
            </Modal>
 
-           <TouchableOpacity onPress={() => checkInput()} style={localStyles.button}>
+           <TouchableOpacity onPress={() => checkInput()}>
            <Image
             source={require('../assets/paypal.png')}
-            style={{width:260,height:50}}
+            style={{width:'100%',height:60}}
             />
             
             </TouchableOpacity>

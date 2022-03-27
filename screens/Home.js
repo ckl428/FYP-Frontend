@@ -1,4 +1,6 @@
 import React from 'react'
+import { baseUrl } from '../global_url';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet,FlatList,ScrollView,Image, SafeAreaView, } from 'react-native'
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect,useRef } from 'react';
@@ -23,8 +25,6 @@ export default function Home({ navigation }) {
   const dropdownRef = useRef({}); 
   
     useEffect(() => {
-      
-
       AsyncStorage.getItem('userName').then((value)=>{
         setUser(value)
         console.log('saved user', user)
@@ -35,10 +35,14 @@ export default function Home({ navigation }) {
       })
      
       fetchTicket()
-      
     }, []);
+  
+    useFocusEffect(
+      React.useCallback(() => {
+        fetchTicket()
+      }, [])
+    );
 
-  const baseUrl = 'http://192.168.0.105:3000';
 
   const fetchTicket = () =>{
     fetch(baseUrl+'/api/ticket/getTicket')
@@ -83,6 +87,7 @@ export default function Home({ navigation }) {
       navigation.navigate('Detail', {
       _id: item._id,
       paramUserId:userId,
+      deptName: item.deptName,
       name: item.name,
       price: item.price,
       start:item.start,
@@ -101,7 +106,7 @@ export default function Home({ navigation }) {
     
     
     <Image
-        source={require('../assets/Images/Flag/HongKong.png')}
+        source={getSource(item.deptName)}
         style={{width:40,height:22.5}}
     />
     <Text style={localStyles.contents}>{item.start}</Text>

@@ -4,13 +4,12 @@ import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AnimatedLottieView from 'lottie-react-native';
 
 export default function Receipt({ navigation,route }) {
     const [asyncUser,setUser] = useState('')
     const [asyncUserId,setUserId] = useState('')
     const [data,setData] = useState([]);
-    const {_id,user,userId,customerName,passport,departureDate,departureTime,arrivalTime,name,price,total,start,dest,duration,company,image,quota,meal,airClass,gender}  = route.params;
+    const {_id,user,userId,customerName,passport,departureDate,departureTime,arrivalTime,deptName,name,price,total,start,dest,duration,company,image,quota,meal,airClass,gender}  = route.params;
     const [loading,setLoading] = useState(true)
     
     const getUserInfo = async () =>{
@@ -25,8 +24,7 @@ export default function Receipt({ navigation,route }) {
         getUserInfo()
         console.log('Data',route.params)
       }, []);
-    
-      const baseUrl = 'http://192.168.0.105:3000'
+  
       
       const getSource = (name) =>{
         switch(name){
@@ -50,7 +48,7 @@ export default function Receipt({ navigation,route }) {
  
  
          <Image
-           source={require('../assets/Images/Flag/HongKong.png')}
+           source={getSource(deptName)}
            style={{width:40,height:22.5}}
          />
          <Text style={localStyles.contents}>{start}</Text>
@@ -95,7 +93,8 @@ export default function Receipt({ navigation,route }) {
      {/**Ticket data */}
      <Text style = {localStyles.smallTitle}>Ticket Data</Text>
      <View style={{borderBottomColor: 'black', borderBottomWidth: 1,}}/>
-     <Text style = {localStyles.contents}>Counrty: {name}</Text>
+     <Text style = {localStyles.contents}>Departure: {deptName}</Text>
+     <Text style = {localStyles.contents}>Arrival: {name}</Text>
      <Text style = {localStyles.contents}>Start Airport: {start}</Text>
      <Text style = {localStyles.contents}>Destination Airport: {dest}</Text>
      <Text style = {localStyles.contents}>Departure Date: {departureDate}</Text>

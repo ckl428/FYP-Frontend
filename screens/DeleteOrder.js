@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '../layout/Card';
 import {Picker} from '@react-native-picker/picker';
+import { baseUrl } from '../global_url';
 
 export default function DeleteOrder({ navigation,route }) {
   const [ticketName,setTicketName] = useState('');
@@ -50,7 +51,7 @@ const getSource = (name) =>{
         console.log('Passport',passport)
  }, []);
  
- const baseUrl = 'http://192.168.0.105:3000';
+ 
 
  const getOrder = () =>{
    fetch(baseUrl+'/api/ticket/getAllOrder')

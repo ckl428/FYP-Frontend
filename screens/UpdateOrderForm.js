@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import {Picker} from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { baseUrl } from '../global_url';
 
 export default function UpdateOrderForm({ route,navigation }) {
     const { _id,user,paramUserId,name,customerName,price,start,dest,duration,company,image,quota,departureTime,arrivalTime,pPassport,pDepartureDate,pAirClass,pMeal} = route.params;
@@ -46,12 +47,6 @@ export default function UpdateOrderForm({ route,navigation }) {
         return 0;
     }
 
-   
-
-
-   
-  
-    const baseUrl = 'http://192.168.0.105:3000'
 
     const updateOrder = async () =>{
         console.log('selected passport', passport)

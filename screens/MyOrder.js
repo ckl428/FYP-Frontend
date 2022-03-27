@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AnimatedLottieView from 'lottie-react-native';
-
+import { baseUrl } from '../global_url';
 export default function MyOrder({ navigation,route }) {
     const [user,setUser] = useState('')
     const [userId,setUserId] = useState('')
@@ -26,7 +26,7 @@ export default function MyOrder({ navigation,route }) {
         fetchOrder()
       }, []);
     
-      const baseUrl = 'http://192.168.0.105:3000'
+
       const fetchOrder = async () =>{
         console.log('before id', pUserId)
         const fetchURL = baseUrl+'/api/ticket/getOrder/'+pUserId

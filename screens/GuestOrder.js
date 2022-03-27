@@ -2,15 +2,14 @@ import React from 'react'
 import { View, Text, StyleSheet,ScrollView,FlatList,SafeAreaView,TextInput, Alert,Image } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
-import AnimatedLottieView from 'lottie-react-native';
 import Card from '../layout/Card';
-import moment from 'moment';
+import { baseUrl } from '../global_url';
 export default function GuestOrder({navigation,route}) {
 const [record,setRecord] = useState('');
 const [passport, setPassport] = useState('');
 
 
-const baseUrl = 'http://192.168.0.105:3000'
+
       const getGuestOrder = async () =>{
         console.log('passport', passport)
         if(!passport){

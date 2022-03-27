@@ -77,7 +77,6 @@ let register = <TouchableOpacity onPress={() => navigation.navigate('Register')}
   [
     { text: "Yes", onPress: () => logout() },
     { text: "No",onPress: () => alert("Logout cancel"), style: "cancel"}
-    
   ]
   )} style={localStyles.button}>
 <Text style={localStyles.buttonText}>Logout</Text>

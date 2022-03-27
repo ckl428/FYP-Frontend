@@ -3,13 +3,16 @@ import { View, Text, StyleSheet,ScrollView,SafeAreaView,TextInput, Alert } from 
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { baseUrl } from '../global_url';
 
 export default function Cart({ navigation,route }) {
   const [ticketName,setTicketName] = useState('');
   const [user,setUser] = useState('')
   const [userId,setUserId] = useState('')
   const [role,setRole] = useState('')
-
+  const [data,setData] = useState('')
+  let bookMarkArray = []
   
   const getUserInfo = async () =>{
     await AsyncStorage.getItem('userName').then((value)=>{
@@ -22,15 +25,47 @@ export default function Cart({ navigation,route }) {
       setRole(value)
   })
 }
+
+  const getUserBookmark = async()=>{
+      console.log('before id', userId)
+      console.log('before role', role)
+      const fetchURL = baseUrl+'/api/ticket/getUser/'+userId
+      console.log('fetchURL',fetchURL)
+      await fetch(fetchURL)
+          .then((response) => response.json())
+          .then((json) => setData(json))
+          .catch((error) => console.error(error))
+          .finally(() => console.log('data',data.bookmark));
+  }
  useEffect(() => {
         getUserInfo()
-
+        if(userId)
+        getUserBookmark();
+        else
+        console.log('Currently no user')
  }, []);
  
+ useFocusEffect(
+  React.useCallback(() => {
+      addToBook()
+      getUserInfo()
+        if(userId)
+        getUserBookmark();
+        else
+        console.log('Currently no user')
+  }, [])
+);
   
-
+    
+    const addToBook = () =>{
+      bookMarkArray.push('hihi')
+      console.log('array book', bookMarkArray)
+    }
+   
+    
+    
   
-
+   
  
 
   
@@ -38,10 +73,13 @@ export default function Cart({ navigation,route }) {
     return (
       <ScrollView style={[localStyles.container]}>
       
-      <Text style={[localStyles.header]}>Shopping Cart</Text>
+      <Text style={[localStyles.header]}>Bookmark</Text>
       <View style={[localStyles.secondContainer]}>
       
-      
+      <TouchableOpacity onPress={() => getUserBookmark()} style={localStyles.button}>
+        <Text style={localStyles.buttonText}>Fetch {data.name}</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity onPress={() => navigation.goBack()} style={localStyles.button}>
         <Text style={localStyles.buttonText}>Back</Text>
       </TouchableOpacity>

@@ -5,18 +5,18 @@ import { useState, useEffect } from 'react';
 import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { add } from 'react-native-reanimated';
+import { baseUrl } from '../global_url';
 
 
 export default function Detail({ route,navigation }) {
 
-    const baseUrl = 'http://192.168.0.105:3000'
+ 
 
     const [user,setUser] = useState('')
     const [userId, setUserId] = useState('')
     const [role, setRole] = useState('')
     const [showUpdate,setShowUpdate] = useState(false)
-
+    const [updateDeptName,setUpdateDeptName] = useState(deptName)
     const [updateCountry,setUpdateCountry] = useState(name)
     const [updatePrice,setUpdatePrice] = useState(price)
     const [updateStart,setUpdateStart] = useState(start)
@@ -29,6 +29,8 @@ export default function Detail({ route,navigation }) {
     const [ticketArrivalTime, setTicketArrivalTime] = useState(arrivalTime)
     const [isDepartureVisible, setDepartureVisibility] = useState(false);
     const [isArrivalVisible, setArrivalVisibility] = useState(false);
+
+    
   
     const showDeparturePicker = () => {
       setDepartureVisibility(true);
@@ -102,7 +104,7 @@ export default function Detail({ route,navigation }) {
         console.log('Role', role)
       }, []);
     
-    const { _id,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
+    const { _id,deptName,name,price,start,dest,duration,company,image,quota,departureTime,arrivalTime} = route.params;
     //console.log('image', image)
 
     const deleteTicket = async () =>{
@@ -133,6 +135,7 @@ export default function Detail({ route,navigation }) {
         _id: _id,
         user:user,
         paramUserId:userId,
+        deptName:deptName,
         name: name,
         price: price,
         start:start,
@@ -191,6 +194,7 @@ export default function Detail({ route,navigation }) {
           },
           body: JSON.stringify({
             _id:_id,
+            deptName:updateDeptName||deptName,
             name:updateCountry||name,
             price:updatePrice||price,
             start:updateStart||start,
@@ -215,13 +219,14 @@ export default function Detail({ route,navigation }) {
      let place = <TouchableOpacity onPress={() => placeOrder()} style={localStyles.button}>
      <Text style={localStyles.buttonText}>Place Order</Text>
  </TouchableOpacity>
-     let addCart = <TouchableOpacity onPress={() => alert('Add to cart')} style={localStyles.button}>
-     <Text style={localStyles.buttonText}>Add to cart</Text>
+     let addCart = <TouchableOpacity onPress={() => alert('Bookmarked')} style={localStyles.button}>
+     <Text style={localStyles.buttonText}>Bookmark</Text>
      </TouchableOpacity>
 
      let textData = <Card>
      {/**Ticket data */}
-     <Text style = {localStyles.contents}>Counrty: {name}</Text>
+     <Text style = {localStyles.contents}>Departure: {deptName}</Text>
+     <Text style = {localStyles.contents}>Arrival: {name}</Text>
      <Text style = {localStyles.contents}>Price: ${price}</Text>
      <Text style = {localStyles.contents}>Start Airport: {start}</Text>
      <Text style = {localStyles.contents}>Destination Airport: {dest}</Text>
@@ -236,7 +241,18 @@ export default function Detail({ route,navigation }) {
      <ScrollView>
             <Card>
             <View style={{flexDirection:'row',alignItems:'center'}}>
-            <Text>Country: </Text>
+            <Text>Departure: </Text>
+            <TextInput 
+              onChangeText={updateDeptName => setUpdateDeptName(updateDeptName)} defaultValue={deptName}
+              placeholderTextColor="#000000"
+            >
+            </TextInput>
+            </View>
+            </Card>
+
+            <Card>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Arrival: </Text>
             <TextInput 
               onChangeText={updateCountry => setUpdateCountry(updateCountry)} defaultValue={name}
               placeholderTextColor="#000000"
@@ -367,7 +383,7 @@ export default function Detail({ route,navigation }) {
     
     
             <Image
-              source={require('../assets/Images/Flag/HongKong.png')}
+              source={getSource(deptName)}
               style={{width:40,height:22.5}}
             />
             <Text style={localStyles.contents}>{start}</Text>
