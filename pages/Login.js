@@ -69,6 +69,7 @@ function Login({ navigation }) {
       AsyncStorage.setItem('userName',user.name)
       AsyncStorage.setItem('userId',user._id)
       AsyncStorage.setItem('role',user.role)
+      //AsyncStorage.setItem('booklist', JSON.stringify(user.bookmark))
       alert('Login success ')
       navigation.navigate('Intro')
     }

@@ -14,6 +14,7 @@ import Receipt from "../screens/Receipt";
 import UpdateOrder from "../screens/UpdateOrder";
 import UpdateOrderForm from "../screens/UpdateOrderForm";
 import DeleteOrder from "../screens/DeleteOrder";
+import Bookmark from "../screens/Bookmark"
 
 
 
@@ -62,6 +63,9 @@ function App_Navigator() {
   );
   const deleteOrderComponent = (navigation,route) => (
     <DeleteOrder navigation={navigation.navigation} route={navigation.route}/>
+  );
+  const bookMarkComponent = (navigation,route) => (
+    <Bookmark navigation={navigation.navigation} route={navigation.route}/>
   );
 
  
@@ -131,6 +135,11 @@ function App_Navigator() {
         <Stack.Screen
           name="DeleteOrder"
           component={deleteOrderComponent}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Bookmark"
+          component={bookMarkComponent}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

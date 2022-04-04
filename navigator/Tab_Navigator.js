@@ -14,9 +14,7 @@ const settingComponent = (navigation) => (
   <Setting navigation={navigation.navigation}/>
 );
 
-const bookMarkComponent = (navigation) => (
-  <Bookmark navigation={navigation.navigation}/>
-);
+
 
 
 
@@ -29,8 +27,6 @@ const bookMarkComponent = (navigation) => (
         <Tab.Navigator >
           <Tab.Screen name="Home" component={homeComponent} 
           options={{tabBarIcon:() => (<Image source={require("../assets/homeicon.png")} style={{width: 30, height: 30}} />)}}/>
-          <Tab.Screen name="Bookmark" component={bookMarkComponent} 
-          options={{tabBarIcon:() => (<Image source={require("../assets/shoppingcart.png")} style={{width: 30, height: 30}} />)}}/>
           <Tab.Screen name="Setting" component={settingComponent} 
           options={{tabBarIcon:() => (<Image source={require("../assets/setting.png")} style={{width: 30, height: 30}} />)}}/>
           

@@ -140,13 +140,15 @@ export default function Home({ navigation }) {
 
 let keywordsSearch =  
 <View style={{flexDirection:'row', }}>
-<TextInput 
+ 
+  <TextInput 
   placeholder='Where you want to go?'
   placeholderTextColor="#b3cddf" 
   keyboardType="default"
   onChangeText={search => setSearch(search)} 
   defaultValue={search}
   ></TextInput>
+
         <View style={{flexDirection:'row',marginLeft: 'auto',  marginHorizontal:4,
             marginVertical:6}}>
               <TouchableOpacity onPress={()=>{
@@ -156,7 +158,7 @@ let keywordsSearch =
         <Text>X</Text>
         </TouchableOpacity>
         </View>
-        </View>
+    </View>
   
   
 

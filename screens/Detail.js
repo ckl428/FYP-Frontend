@@ -29,6 +29,7 @@ export default function Detail({ route,navigation }) {
     const [ticketArrivalTime, setTicketArrivalTime] = useState(arrivalTime)
     const [isDepartureVisible, setDepartureVisibility] = useState(false);
     const [isArrivalVisible, setArrivalVisibility] = useState(false);
+    
 
     
   
@@ -64,13 +65,7 @@ export default function Detail({ route,navigation }) {
     };
     
 
-    const fetchTicket = () =>{
-      fetch(baseUrl+'/api/ticket/getTicket')
-          .then((response) => response.json())
-          .then((json) => console.log(''))
-          .catch((error) => console.error(error))
-          .finally(() => console.log('Name data'));
-    }
+  
     const getUserInfo = async () =>{
         await AsyncStorage.getItem('userName').then((value)=>{
             setUser(value)
@@ -83,6 +78,7 @@ export default function Detail({ route,navigation }) {
       })
      
     }
+   
     const getSource = (name) =>{
       switch(name){
         case "Hong Kong":
@@ -97,10 +93,9 @@ export default function Detail({ route,navigation }) {
           return require('../assets/Images/Flag/SouthKorea.png')
       }
     }
-
+   
     useEffect(() => {
         getUserInfo()
-        fetchTicket()
         console.log('Role', role)
       }, []);
     
@@ -215,13 +210,54 @@ export default function Detail({ route,navigation }) {
           })
         .catch((error) => { console.warn(error); });
          }
-   
+      const bookmark = async () =>{
+        console.log('User id', userId)
+        console.log('Bookmark ticket', _id)
+        if(user){
+          const url = baseUrl+'/api/ticket/bookmark'
+            await fetch(url,{
+            method:'POST',
+              headers:{
+              'Accept':'application/json',
+              'Content-type':'application/json'
+          },
+            body: JSON.stringify({
+              _id:_id,
+              userId:userId,
+              deptName:updateDeptName||deptName,
+              name:updateCountry||name,
+              price:updatePrice||price,
+              start:updateStart||start,
+              dest:updateDestination||dest,
+              duration:getDuration()||duration,
+              departureTime:updateDepartureTime||departureTime,
+              arrivalTime:updateArrivalTime||arrivalTime,
+              company:updateCompany||company,
+              quota:parseInt(updateQuota)||quota,
+            })
+    }
+    )
+    .then((response) => response.text())
+    .then((responseText) => { 
+      alert(responseText);
+      })
+    .catch((error) => { console.warn(error); });
+        
+        }
+        else
+        alert('login first')
+      }
      let place = <TouchableOpacity onPress={() => placeOrder()} style={localStyles.button}>
      <Text style={localStyles.buttonText}>Place Order</Text>
  </TouchableOpacity>
-     let addCart = <TouchableOpacity onPress={() => alert('Bookmarked')} style={localStyles.button}>
+     let addCart = <TouchableOpacity onPress={() => bookmark()} style={localStyles.button}>
      <Text style={localStyles.buttonText}>Bookmark</Text>
      </TouchableOpacity>
+
+
+let removeCart = <TouchableOpacity onPress={() => alert('remove')} style={localStyles.button}>
+<Text style={localStyles.buttonText}>Unbookmark</Text>
+</TouchableOpacity>
 
      let textData = <Card>
      {/**Ticket data */}
@@ -413,7 +449,7 @@ export default function Detail({ route,navigation }) {
            
             {showUpdate?updateData:textData}
             {showUpdate?null:place}
-            {showUpdate?null:addCart}
+            
             {showUpdate?comfirmButton:null}
             {showUpdate||role!='admin'?null:updateButton}
             {showUpdate||role!='admin'?cancelButton:null}

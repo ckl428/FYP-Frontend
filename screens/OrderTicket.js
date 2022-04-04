@@ -16,14 +16,31 @@ export default function OrderTicket({ route,navigation }) {
     const [meal, setMeal] = useState('No Meal');
     const [departureDate, setDepartureDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [isBackDatePickerVisible, setBackDatePickerVisibility] = useState(false);
     const [showModal,setShowModal] = useState(false);
+    const [data,setData] = useState('')
+    const [backData,setBackData] = useState('')
+    const [back,setBack] = useState('No')
+    const [selectedBack,setSelectedBack] = useState()
+    const [backDate,setBackDate] = useState('')
+    const [backClass,setBackClass] = useState('Economy Class')
+    const [backMeal,setBackMeal] = useState('No Meal')
+    
+
 
     
     const showDatePicker = () => {
     setDatePickerVisibility(true);
     };
+    
     const hideDatePicker = () => {
     setDatePickerVisibility(false);
+    };
+    const showBackDatePicker = () => {
+      setBackDatePickerVisibility(true);
+    };
+    const hideBackDatePicker = () => {
+      setBackDatePickerVisibility(false);
     };
     const handleConfirm = (date) => {
     var dateObj = JSON.stringify(date);
@@ -32,6 +49,13 @@ export default function OrderTicket({ route,navigation }) {
     setDepartureDate(dateObj.substring(1,11))
     hideDatePicker();
     };
+    const handleBackConfirm = (date) => {
+      var dateObj = JSON.stringify(date);
+      
+      console.log("A date has been picked: ", dateObj.substring(1,11));
+      setBackDate(dateObj.substring(1,11))
+      hideDatePicker();
+   };
 
     const getPrice = (obj) =>{
       if(obj == 'Meal 1')
@@ -49,8 +73,18 @@ export default function OrderTicket({ route,navigation }) {
       else
         return 0;
     }
-
-   
+    useEffect(() => {
+      fetchTicket()
+      
+    }, []);
+    
+    const fetchTicket = () =>{
+      fetch(baseUrl+'/api/ticket/getTicket')
+          .then((response) => response.json())
+          .then((json) => setData(json))
+          .catch((error) => console.error(error))
+          .finally(() => console.log('data',data));
+    }
 
    
    
@@ -78,9 +112,11 @@ export default function OrderTicket({ route,navigation }) {
             departureDate:departureDate,
             departureTime:departureTime,
             arrivalTime:arrivalTime,
+            backDepartureDate:backDate,
             deptName:deptName,
             name:name,
             price:price,
+            backPrice:backPrice,
             total:total,
             start:start,
             dest:dest,
@@ -105,6 +141,7 @@ export default function OrderTicket({ route,navigation }) {
             customerName:custName,
             passport:passport,
             departureDate:departureDate,
+            backDepartureDate:backDate,
             departureTime:departureTime,
             arrivalTime:arrivalTime,
             deptName:deptName,
@@ -136,7 +173,10 @@ export default function OrderTicket({ route,navigation }) {
         return;
       }
     }
-    let total = price*getPrice(airClass)+getPrice(meal)
+    let backPrice = back==='Yes'?price*getPrice(backClass)+getPrice(backMeal):0
+    let total = price*getPrice(airClass)+getPrice(meal)+backPrice
+
+       
 
     const handleResponse = (data) => {
       checkInput()
@@ -151,6 +191,62 @@ export default function OrderTicket({ route,navigation }) {
         alert('Payment cancel')
       }
     }
+
+    let selectReturnTicket=
+    <Card>
+    <Text>Select return ticket</Text>
+    <Picker
+    selectedValue={selectedBack}
+    onValueChange={(backPrice,) =>
+    setSelectedBack(backPrice)
+    }> 
+    {data !== "" ? (
+        data.map(client => {
+            if(client.name===deptName&&client.deptName===name){
+            console.log('client price', client.price)
+            return <Picker.Item label={client.start + ' to ' + client.dest + ' ' + 
+            client.departureTime + ' - ' + client.arrivalTime} key = {client._id} value={client.price} />
+            }
+        })
+    ) : (
+        <Picker.Item label="Loading..." value="0" />
+    )}
+    </Picker>
+    </Card>
+
+    let selectReturnDate = <Card>
+    <Button title="Select Return Date" onPress={showBackDatePicker} />
+    <DateTimePickerModal
+        isVisible={isBackDatePickerVisible}
+        mode="date"
+        onConfirm={handleBackConfirm}
+        onCancel={hideBackDatePicker}
+    />
+    <Text>Departure Date: {backDate?backDate:'Choose Your Date First'}</Text>
+    </Card>
+
+    let selectBackAirClass = <Card>
+    <Picker
+     selectedValue={backClass}
+     onValueChange={(itemValue, itemIndex) =>
+     setBackClass(itemValue)
+     }>
+     <Picker.Item label="Economy Class" value="Economy Class" />
+     <Picker.Item label="Business Class" value="Business Class" />
+     <Picker.Item label="First Class" value="First Class" />
+     </Picker>
+     </Card>
+    let selectReturnMeal = <Card>
+    <Picker
+    selectedValue={backMeal}
+    onValueChange={(itemValue, itemIndex) =>
+    setBackMeal(itemValue)
+    }>
+    <Picker.Item label="No Meal" value="No Meal" />
+    <Picker.Item label="Meal 1" value="Meal 1" />
+    <Picker.Item label="Meal 2" value="Meal 2" />
+    </Picker>
+    </Card>
     return (
       //Custoemr name, 
       <ScrollView style={[localStyles.container]}>
@@ -208,7 +304,7 @@ export default function OrderTicket({ route,navigation }) {
             </Card>
 
             <Card>
-           <Picker
+            <Picker
             selectedValue={meal}
             onValueChange={(itemValue, itemIndex) =>
             setMeal(itemValue)
@@ -218,6 +314,24 @@ export default function OrderTicket({ route,navigation }) {
             <Picker.Item label="Meal 2" value="Meal 2" />
             </Picker>
             </Card>
+
+            <Card>
+            <Text>Need return?</Text>
+            <Picker
+            selectedValue={back}
+            onValueChange={(itemValue, itemIndex) =>
+            setBack(itemValue)
+            }>
+            <Picker.Item label="No" value="No" />
+            <Picker.Item label="Yes" value="Yes" />
+            </Picker>
+            </Card>
+
+            {back==='Yes'?selectReturnTicket:null}
+            {back==='Yes'?selectReturnDate:null}
+            {back==='Yes'?selectBackAirClass:null}
+            {back==='Yes'?selectReturnMeal:null}
+            
             
             <Card>
               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
@@ -233,11 +347,29 @@ export default function OrderTicket({ route,navigation }) {
               <Text>Meal Price:</Text>
               <Text>${getPrice(meal)?getPrice(meal):0}</Text>
               </View>
+              {back==='Yes'?
+              <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Text>Back Class Type:</Text>
+              <Text>{backClass}</Text>
+              </View>:null}
+              {back==="Yes"?
+              <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Text>Back Ticket Price:</Text>
+              <Text>${price*getPrice(backClass)}</Text>
+              </View>
+              :null}
+              {back==='Yes'?
+              <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Text>Meal Price:</Text>
+              <Text>${getPrice(backMeal)?getPrice(backMeal):0}</Text>
+              </View>:null}
               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
               <Text>Member Discount:</Text>
               <Text>${user?total-total*0.9:0}</Text>
               </View>
+              
               <View style={{borderBottomColor: 'black', borderBottomWidth: 1,}}/>
+
 
               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
               <Text>Total:</Text>
@@ -259,6 +391,8 @@ export default function OrderTicket({ route,navigation }) {
              injectedJavaScript={`
              document.getElementById('ticketPrice').value=${price*getPrice(airClass)};
              document.getElementById('mealPrice').value=${getPrice(meal)?getPrice(meal):0};
+             document.getElementById('backPrice').value=${price*getPrice(backClass)};
+             document.getElementById('backMealPrice').value=${getPrice(backMeal)?getPrice(backMeal):0};
              document.getElementById('memberPrice').value=${user?total-total*0.9:0};
              document.f1.submit();
              `}

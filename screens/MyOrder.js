@@ -7,8 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AnimatedLottieView from 'lottie-react-native';
 import { baseUrl } from '../global_url';
 export default function MyOrder({ navigation,route }) {
-    const [user,setUser] = useState('')
-    const [userId,setUserId] = useState('')
     const [data,setData] = useState([]);
     const {pUserId}  = route.params;
     const [loading,setLoading] = useState(true)
@@ -36,6 +34,8 @@ export default function MyOrder({ navigation,route }) {
             .catch((error) => console.error(error))
             .finally(() => setLoading(false));
       }
+
+      
       const getSource = (name) =>{
         switch(name){
           case "Hong Kong":

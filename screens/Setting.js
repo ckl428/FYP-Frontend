@@ -5,11 +5,11 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Setting({ navigation,route }) {
-  const [ticketName,setTicketName] = useState('');
+  
   const [user,setUser] = useState('')
   const [userId,setUserId] = useState('')
   const [role,setRole] = useState('')
-
+  
   
   const getUserInfo = async () =>{
     await AsyncStorage.getItem('userName').then((value)=>{
@@ -24,6 +24,7 @@ export default function Setting({ navigation,route }) {
 }
  useEffect(() => {
         getUserInfo()
+        console.log('userid',userId)
 
  }, []);
   const logout = ()=>{
@@ -42,7 +43,13 @@ export default function Setting({ navigation,route }) {
     navigation.navigate('GuestOrder', {
       pUserId:userId 
   });
-}
+  }
+
+  const bookMark = () =>{
+    navigation.navigate('Bookmark', {
+      pUserId:userId 
+  });
+  }
 
  
 
@@ -72,6 +79,10 @@ let register = <TouchableOpacity onPress={() => navigation.navigate('Register')}
   let checkOrder =  <TouchableOpacity onPress={() => guestOrder()} style={localStyles.button}>
   <Text style={localStyles.buttonText}>Check My Order</Text>
   </TouchableOpacity>
+
+let bookMarkPage =  <TouchableOpacity onPress={() => {userId?bookMark():alert('Login first')}} style={localStyles.button}>
+<Text style={localStyles.buttonText}>Bookmark</Text>
+</TouchableOpacity>
 
   let lgout =  <TouchableOpacity onPress={() => Alert.alert("Confirmation","Are you sure to logout?",
   [
@@ -105,6 +116,7 @@ let register = <TouchableOpacity onPress={() => navigation.navigate('Register')}
         
       );
   }
+
 
   
   const localStyles = StyleSheet.create({
@@ -166,4 +178,3 @@ let register = <TouchableOpacity onPress={() => navigation.navigate('Register')}
       textAlign: 'center'
     },
   });
-  

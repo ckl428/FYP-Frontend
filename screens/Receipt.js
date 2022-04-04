@@ -9,7 +9,7 @@ export default function Receipt({ navigation,route }) {
     const [asyncUser,setUser] = useState('')
     const [asyncUserId,setUserId] = useState('')
     const [data,setData] = useState([]);
-    const {_id,user,userId,customerName,passport,departureDate,departureTime,arrivalTime,deptName,name,price,total,start,dest,duration,company,image,quota,meal,airClass,gender}  = route.params;
+    const {_id,user,userId,customerName,passport,departureDate,backDepartureDate,departureTime,arrivalTime,deptName,name,price,total,start,dest,duration,company,image,quota,meal,airClass,gender}  = route.params;
     const [loading,setLoading] = useState(true)
     
     const getUserInfo = async () =>{
@@ -100,6 +100,7 @@ export default function Receipt({ navigation,route }) {
      <Text style = {localStyles.contents}>Departure Date: {departureDate}</Text>
      <Text style = {localStyles.contents}>Departure Time: {departureTime}</Text>
      <Text style = {localStyles.contents}>Arrival Time: {arrivalTime}</Text>
+     <Text style = {localStyles.contents}>Back Departure Date: {backDepartureDate}</Text>
      <Text style = {localStyles.contents}>Duration: {duration}</Text>
      <Text style = {localStyles.contents}>Class Type: {airClass}</Text>
      <Text style = {localStyles.contents}>Meal: {meal}</Text>

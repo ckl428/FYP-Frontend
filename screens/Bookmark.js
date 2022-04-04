@@ -1,99 +1,127 @@
 import React from 'react'
-import { View, Text, StyleSheet,ScrollView,SafeAreaView,TextInput, Alert } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet,FlatList,ScrollView,Image, SafeAreaView } from 'react-native'
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useState, useEffect } from 'react';
+import Card from '../layout/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import AnimatedLottieView from 'lottie-react-native';
 import { baseUrl } from '../global_url';
+export default function Bookmark({ navigation,route }) {
+    const [user,setUser] = useState('')
+    const [userId,setUserId] = useState('')
+    const [data,setData] = useState([]);
+    const {pUserId}  = route.params;
+    const [loading,setLoading] = useState(true)
 
-export default function Cart({ navigation,route }) {
-  const [ticketName,setTicketName] = useState('');
-  const [user,setUser] = useState('')
-  const [userId,setUserId] = useState('')
-  const [role,setRole] = useState('')
-  const [data,setData] = useState('')
-  let bookMarkArray = []
-  
-  const getUserInfo = async () =>{
-    await AsyncStorage.getItem('userName').then((value)=>{
-        setUser(value)
-    })
-    await AsyncStorage.getItem('userId').then((value)=>{
-        setUserId(value)
-    })
-    await AsyncStorage.getItem('role').then((value)=>{
-      setRole(value)
-  })
-}
-
-  const getUserBookmark = async()=>{
-      console.log('before id', userId)
-      console.log('before role', role)
-      const fetchURL = baseUrl+'/api/ticket/getUser/'+userId
-      console.log('fetchURL',fetchURL)
-      await fetch(fetchURL)
-          .then((response) => response.json())
-          .then((json) => setData(json))
-          .catch((error) => console.error(error))
-          .finally(() => console.log('data',data.bookmark));
-  }
- useEffect(() => {
-        getUserInfo()
-        if(userId)
-        getUserBookmark();
-        else
-        console.log('Currently no user')
- }, []);
- 
- useFocusEffect(
-  React.useCallback(() => {
-      addToBook()
-      getUserInfo()
-        if(userId)
-        getUserBookmark();
-        else
-        console.log('Currently no user')
-  }, [])
-);
-  
     
-    const addToBook = () =>{
-      bookMarkArray.push('hihi')
-      console.log('array book', bookMarkArray)
+    const getUserInfo = async () =>{
+        await AsyncStorage.getItem('userName').then((value)=>{
+            setUser(value)
+        })
+        await AsyncStorage.getItem('userId').then((value)=>{
+            setUserId(value)
+        })
     }
-   
-    
-    
-  
-   
+    useEffect(() => {
+        getUserInfo()
+        fetchBookmark()
+
+      }, []);
+      const fetchBookmark = async () =>{
+        console.log('before id', pUserId)
+        const fetchURL = baseUrl+'/api/ticket/getBookmark/'+pUserId
+        await fetch(fetchURL)
+            .then((response) => response.json())
+            .then((json) => setData(json))
+            .catch((error) => console.error(error))
+            .finally(() => setLoading(false));
+      }
+      const getSource = (name) =>{
+        switch(name){
+          case "Hong Kong":
+            return require('../assets/Images/Flag/HongKong.png')
+          case "China":
+            return require('../assets/Images/Flag/China.png')
+          case "Japan":
+            return require('../assets/Images/Flag/Japan.png')
+          case "Dubai":
+            return require('../assets/Images/Flag/Dubai.png')
+          case "South Korea":
+            return require('../assets/Images/Flag/SouthKorea.png')
+        }
+      }
+      let content  = 
+      
+      <FlatList
+      style={{}}
+      data={data}
+      keyExtractor={item => item._id}
+      refreshing={true}
+      
+      renderItem={({ item }) => (
+      <Card>
+        <TouchableOpacity onPress={()=>{
+        alert('Hello')
+      }}
+      >
+      <View style={{flexDirection:"row", justifyContent:'space-between'}}>
+ <View>
+ <Image
+         source={require('../assets/Images/Flag/HongKong.png')}
+         style={{width:40,height:22.5}}
+ />
+ <Text style={localStyles.contents}>{item.start}</Text>
+ <Text style={localStyles.contents}>{item.departureTime}</Text>
+ </View>
+ <View>
+ <Image
+     source={require('../assets/airplane.png')}
+     style={{width:50,height:40}}
+   />
+ <Text>{item.duration}</Text>
+ </View>
  
+ <View>
+ <Image
+         source={getSource(item.name)}
+         style={{width:40,height:22.5}}
+ />
+ <Text style={localStyles.contents}>{item.dest}</Text>
+ <Text style={localStyles.contents}>{item.arrivalTime}</Text>
+ </View>
+ </View>
+ <View style={{borderBottomColor: 'black', borderBottomWidth: 1,}}/>
+ <Text>Customer: {item.customerName}</Text>
+ <Text>Gender: {item.gender}</Text>
+ <Text>Passport: {item.passport}</Text>
+ </TouchableOpacity>
+
+      
+      </Card>
+      )}
+      />
+
 
   
   
+      
+   
+      
+     
+      
+     
     return (
-      <ScrollView style={[localStyles.container]}>
+        <SafeAreaView style={{flex:1, backgroundColor:'#fff', padding: 20, marginVertical: 50,marginHorizontal: 16, }}>
+         <Text style={localStyles.text}>Bookmark</Text>
       
-      <Text style={[localStyles.header]}>Bookmark</Text>
-      <View style={[localStyles.secondContainer]}>
-      
-      <TouchableOpacity onPress={() => getUserBookmark()} style={localStyles.button}>
-        <Text style={localStyles.buttonText}>Fetch {data.name}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.goBack()} style={localStyles.button}>
+        {loading?<AnimatedLottieView source={require('../loading.json')} autoPlay loop/>:content}    
+        <TouchableOpacity onPress={() => navigation.goBack()} style={localStyles.button}>
         <Text style={localStyles.buttonText}>Back</Text>
       </TouchableOpacity>
-      
-      </View>
-
-  </ScrollView>
-
-        
-      );
-  }
-
-  
-  const localStyles = StyleSheet.create({
+        </SafeAreaView>
+    )
+}
+const localStyles = StyleSheet.create({
     container: {
       height: '100%',
       backgroundColor: '#ECF0F1',
@@ -101,6 +129,10 @@ export default function Cart({ navigation,route }) {
     text:{
         fontSize:24,
         color:'#14956f'
+    },
+    contents:{
+      fontSize:18,
+        color:'#ff0095'
     },
     header: {
       textAlign: 'center',
@@ -142,7 +174,7 @@ export default function Cart({ navigation,route }) {
     },
     button: {
       backgroundColor: "#145F95",
-      padding: 10,
+      padding: 20,
       borderRadius: 5,
       margin: '5%',
     },
@@ -150,5 +182,10 @@ export default function Cart({ navigation,route }) {
       fontSize: 24,
       color: '#fff',
       textAlign: 'center'
+    },
+    image:{
+      width: '100%',
+      height: 150,
+      borderRadius:6
     },
   });
